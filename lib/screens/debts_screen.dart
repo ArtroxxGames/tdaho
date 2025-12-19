@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -67,6 +68,8 @@ class DebtsScreen extends StatelessWidget {
   }
 
   Widget _buildDebtCard(BuildContext context, Debt debt) {
+    final formattedDate = DateFormat.yMMMd().format(debt.dueDate);
+
     return Card(
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
@@ -95,7 +98,7 @@ class DebtsScreen extends StatelessWidget {
                 Icon(Icons.calendar_today, size: 16, color: Colors.white70),
                 const SizedBox(width: 8),
                 Text(
-                  "Vence el ${debt.dueDate.day}/${debt.dueDate.month}/${debt.dueDate.year}",
+                  "Vence el $formattedDate",
                   style: GoogleFonts.roboto(fontSize: 14, color: Colors.white70),
                 ),
               ],

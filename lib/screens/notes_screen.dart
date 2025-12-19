@@ -1,1 +1,97 @@
-import \'package:flutter/material.dart\';\nimport \'package:flutter_gen/gen_l10n/app_localizations.dart\';\nimport \'package:google_fonts/google_fonts.dart\';\nimport \'package:tdah_organizer/widgets/add_note_form.dart\';\n\nclass NotesScreen extends StatefulWidget {\n  const NotesScreen({super.key});\n\n  @override\n  _NotesScreenState createState() => _NotesScreenState();\n}\n\nclass _NotesScreenState extends State<NotesScreen> {\n  final List<_Note> _notes = [\n    _Note(title: \"Ideas para el proyecto\", content: \"Recordar investigar sobre animaciones en Flutter y paletas de colores.\"),\n    _Note(title: \"Lista de compras\", content: \"Leche, pan, huevos, y mantequilla.\"),\n    _Note(title: \"Reunión de equipo\", content: \"Lunes a las 10 AM. Preparar la presentación.\"),\n    _Note(title: \"Recordatorio\", content: \"Llamar a mamá.\"),\n  ];\n\n  void _addNote(String title, String content) {\n    setState(() {\n      _notes.add(_Note(title: title, content: content));\n    });\n  }\n\n  void _showAddNoteForm() {\n    showModalBottomSheet(\n      context: context,\n      isScrollControlled: true,\n      builder: (_) {\n        return Padding(\n          padding: EdgeInsets.only(\n            bottom: MediaQuery.of(context).viewInsets.bottom,\n          ),\n          child: AddNoteForm(onAdd: _addNote),\n        );\n      },\n    );\n  }\n\n  @override\n  Widget build(BuildContext context) {\n    final l10n = AppLocalizations.of(context)!;\n\n    return Scaffold(\n      body: Padding(\n        padding: const EdgeInsets.all(16.0),\n        child: Column(\n          crossAxisAlignment: CrossAxisAlignment.start,\n          children: [\n            Text(\n              l10n.notes,\n              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold),\n            ),\n            const SizedBox(height: 24),\n            Expanded(\n              child: ListView.builder(\n                itemCount: _notes.length,\n                itemBuilder: (context, index) {\n                  final note = _notes[index];\n                  return _buildNoteCard(context, note);\n                },\n              ),\n            ),\n          ],\n        ),\n      ),\n      floatingActionButton: FloatingActionButton(\n        onPressed: _showAddNoteForm,\n        child: const Icon(Icons.add),\n        tooltip: \"Añadir Nota\",\n      ),\n    );\n  }\n\n  Widget _buildNoteCard(BuildContext context, _Note note) {\n    return Card(\n      elevation: 4,\n      margin: const EdgeInsets.only(bottom: 16),\n      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),\n      child: Container(\n        padding: const EdgeInsets.all(20),\n        decoration: BoxDecoration(\n          borderRadius: BorderRadius.circular(16),\n          color: Theme.of(context).cardColor,\n        ),\n        child: Column(\n          crossAxisAlignment: CrossAxisAlignment.start,\n          children: [\n            Text(\n              note.title,\n              style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),\n            ),\n            const SizedBox(height: 12),\n            Text(\n              note.content,\n              style: GoogleFonts.roboto(fontSize: 16, color: Colors.white70),\n            ),\n          ],\n        ),\n      ),\n    );\n  }\n}\n\nclass _Note {\n  final String title;\n  final String content;\n\n  _Note({required this.title, required this.content});\n}\n
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:tdah_organizer/models/note.dart';
+import 'package:tdah_organizer/providers/note_provider.dart';
+import 'package:tdah_organizer/widgets/add_note_form.dart';
+
+class NotesScreen extends StatelessWidget {
+  const NotesScreen({super.key});
+
+  void _showAddNoteForm(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: AddNoteForm(onAdd: (title, content) {
+            final newNote = Note(title: title, content: content);
+            Provider.of<NoteProvider>(context, listen: false).addNote(newNote);
+          }),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.notes,
+              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
+            Expanded(
+              child: Consumer<NoteProvider>(
+                builder: (context, noteProvider, child) {
+                  return ListView.builder(
+                    itemCount: noteProvider.notes.length,
+                    itemBuilder: (context, index) {
+                      final note = noteProvider.notes[index];
+                      return _buildNoteCard(context, note);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddNoteForm(context),
+        child: const Icon(Icons.add),
+        tooltip: "Añadir Nota",
+      ),
+    );
+  }
+
+  Widget _buildNoteCard(BuildContext context, Note note) {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Theme.of(context).cardColor,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              note.title,
+              style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              note.content,
+              style: GoogleFonts.roboto(fontSize: 16, color: Colors.white70),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
