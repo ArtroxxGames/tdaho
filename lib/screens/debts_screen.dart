@@ -7,10 +7,17 @@ import 'package:tdah_organizer/models/debt.dart';
 import 'package:tdah_organizer/providers/debt_provider.dart';
 import 'package:tdah_organizer/widgets/add_debt_form.dart';
 
-class DebtsScreen extends StatelessWidget {
+class DebtsScreen extends StatefulWidget {
   const DebtsScreen({super.key});
 
-  void _showAddDebtForm(BuildContext context) {
+  @override
+  State<DebtsScreen> createState() => _DebtsScreenState();
+}
+
+class _DebtsScreenState extends State<DebtsScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  void _showDebtForm(BuildContext context, {Debt? debt}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -19,10 +26,17 @@ class DebtsScreen extends StatelessWidget {
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          child: AddDebtForm(onAdd: (creditor, amount, dueDate) {
-            final newDebt = Debt(creditor: creditor, amount: amount, dueDate: dueDate);
-            Provider.of<DebtProvider>(context, listen: false).addDebt(newDebt);
-          }),
+          child: AddDebtForm(
+            debt: debt,
+            onSave: (newDebt) {
+              final provider = Provider.of<DebtProvider>(context, listen: false);
+              if (debt == null) {
+                provider.addDebt(newDebt);
+              } else {
+                provider.updateDebt(debt, newDebt);
+              }
+            },
+          ),
         );
       },
     );
@@ -46,12 +60,19 @@ class DebtsScreen extends StatelessWidget {
             Expanded(
               child: Consumer<DebtProvider>(
                 builder: (context, debtProvider, child) {
-                  return ListView.builder(
-                    itemCount: debtProvider.debts.length,
-                    itemBuilder: (context, index) {
-                      final debt = debtProvider.debts[index];
-                      return _buildDebtCard(context, debt);
-                    },
+                  return Scrollbar(
+                    controller: _scrollController,
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        headingTextStyle: GoogleFonts.roboto(fontWeight: FontWeight.bold, fontSize: 16),
+                        dataTextStyle: GoogleFonts.roboto(fontSize: 14),
+                        columns: _buildColumns(),
+                        rows: _buildRows(context, debtProvider.debts),
+                      ),
+                    ),
                   );
                 },
               ),
@@ -60,52 +81,119 @@ class DebtsScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddDebtForm(context),
+        onPressed: () => _showDebtForm(context),
         child: const Icon(Icons.add),
         tooltip: "Añadir Deuda",
       ),
     );
   }
 
-  Widget _buildDebtCard(BuildContext context, Debt debt) {
-    final formattedDate = DateFormat.yMMMd().format(debt.dueDate);
+  List<DataColumn> _buildColumns() {
+    final columns = <DataColumn>[DataColumn(label: Text('Acreedor'))];
+    final currentYear = DateTime.now().year;
 
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Theme.of(context).cardColor,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              debt.creditor,
-              style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "\$${debt.amount.toStringAsFixed(2)}",
-              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.red.shade300),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.calendar_today, size: 16, color: Colors.white70),
-                const SizedBox(width: 8),
-                Text(
-                  "Vence el $formattedDate",
-                  style: GoogleFonts.roboto(fontSize: 14, color: Colors.white70),
-                ),
-              ],
-            ),
-          ],
+    for (int month = 1; month <= 12; month++) {
+      columns.add(DataColumn(label: Text(DateFormat.MMM('es').format(DateTime(currentYear, month)))));
+    }
+    return columns;
+  }
+
+  List<DataRow> _buildRows(BuildContext context, List<Debt> debts) {
+    return debts.map((debt) {
+      final cells = <DataCell>[_buildCreditorCell(context, debt)];
+      for (int i = 0; i < 12; i++) {
+        cells.add(_buildPaymentCell(context, debt, i + 1));
+      }
+      return DataRow(cells: cells);
+    }).toList();
+  }
+
+   DataCell _buildCreditorCell(BuildContext context, Debt debt) {
+    return DataCell(
+      Row(
+        children: [
+          Text(debt.creditor, style: GoogleFonts.roboto(fontWeight: FontWeight.w500)),
+          IconButton(
+            icon: const Icon(Icons.edit, size: 18, color: Colors.white54),
+            onPressed: () => _showDebtForm(context, debt: debt),
+            tooltip: 'Editar Deuda',
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  DataCell _buildPaymentCell(BuildContext context, Debt debt, int installment) {
+    final status = debt.getStatusForInstallment(installment);
+
+    return DataCell(
+      GestureDetector(
+        onTap: () => _showStatusMenu(context, debt, installment, status),
+        child: Tooltip(
+          message: status.name,
+          child: Icon(
+            _getStatusIcon(status),
+            color: _getStatusColor(status),
+            size: 28,
+          ),
         ),
       ),
     );
+  }
+
+  IconData _getStatusIcon(PaymentStatus status) {
+    switch (status) {
+      case PaymentStatus.pagado:
+        return Icons.check_circle;
+      case PaymentStatus.pendiente:
+        return Icons.radio_button_unchecked;
+      case PaymentStatus.atrasado:
+        return Icons.error;
+      default:
+        return Icons.help;
+    }
+  }
+
+  Color _getStatusColor(PaymentStatus status) {
+    switch (status) {
+      case PaymentStatus.pagado:
+        return Colors.green.shade400;
+      case PaymentStatus.pendiente:
+        return Colors.grey.shade400;
+      case PaymentStatus.atrasado:
+        return Colors.red.shade400;
+      default:
+        return Colors.blueGrey;
+    }
+  }
+
+  void _showStatusMenu(BuildContext context, Debt debt, int installment, PaymentStatus currentStatus) {
+    final provider = Provider.of<DebtProvider>(context, listen: false);
+
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RenderBox cell = context.findRenderObject() as RenderBox;
+    final position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        cell.localToGlobal(Offset.zero, ancestor: overlay),
+        cell.localToGlobal(cell.size.bottomRight(Offset.zero), ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+
+    showMenu(
+      context: context,
+      position: position,
+      items: PaymentStatus.values.map((status) {
+        return PopupMenuItem(
+          value: status,
+          child: Text(status.name),
+        );
+      }).toList(),
+    ).then((selectedStatus) {
+      if (selectedStatus != null && selectedStatus != currentStatus) {
+        provider.updatePaymentStatus(debt, installment, selectedStatus);
+      }
+    });
   }
 }
