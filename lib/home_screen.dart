@@ -1,21 +1,11 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'screens/dashboard_screen.dart';
-import 'screens/debts_screen.dart';
-import 'screens/subscriptions_screen.dart';
-import 'screens/overdue_payments_screen.dart';
-import 'screens/daily_expenses_screen.dart';
-import 'screens/tasks_screen.dart';
-import 'screens/reminders_screen.dart';
-import 'screens/notes_screen.dart';
-import 'screens/habit_tracker_screen.dart';
-import 'screens/achievements_screen.dart';
-import 'screens/focus_mode_screen.dart';
-import 'screens/pomodoro_timer_screen.dart';
-import 'screens/settings_screen.dart';
-import 'screens/profile_screen.dart';
-import 'screens/about_screen.dart';
+import 'package:myapp/screens/dashboard_screen.dart';
+import 'package:myapp/screens/debts_screen.dart';
+import 'package:myapp/screens/expenses_screen.dart';
+import 'package:myapp/screens/subscriptions_screen.dart';
+import 'package:myapp/screens/notes_screen.dart';
+import 'package:myapp/screens/focus_mode_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -31,19 +21,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const DashboardScreen(),
     const DebtsScreen(),
+    const ExpensesScreen(),
     const SubscriptionsScreen(),
-    const OverduePaymentsScreen(),
-    const DailyExpensesScreen(),
-    const TasksScreen(),
-    const RemindersScreen(),
     const NotesScreen(),
-    const HabitTrackerScreen(),
-    const AchievementsScreen(),
     const FocusModeScreen(),
-    const PomodoroTimerScreen(),
-    const SettingsScreen(),
-    const ProfileScreen(),
-    const AboutScreen(),
   ];
 
   List<String> _getScreenTitles(BuildContext context) {
@@ -51,38 +32,20 @@ class _HomeScreenState extends State<HomeScreen> {
     return [
       l10n.dashboard,
       l10n.debts,
+      l10n.expenses,
       l10n.subscriptions,
-      l10n.overduePayments,
-      l10n.dailyExpenses,
-      l10n.tasks,
-      l10n.reminders,
       l10n.notes,
-      l10n.habitTracker,
-      l10n.achievements,
-      l10n.focusMode,
-      l10n.pomodoroTimer,
-      l10n.settings,
-      l10n.profile,
-      l10n.about,
+      l10n.focus,
     ];
   }
 
   final List<IconData> _screenIcons = [
-    Icons.dashboard,
-    Icons.money_off,
-    Icons.subscriptions,
-    Icons.payment,
-    Icons.request_page,
-    Icons.task,
-    Icons.alarm,
-    Icons.note,
-    Icons.repeat,
-    Icons.shield_moon_outlined,
-    Icons.hourglass_empty,
-    Icons.timer,
-    Icons.settings,
-    Icons.person,
-    Icons.info,
+    Icons.dashboard_rounded,
+    Icons.credit_card_rounded,
+    Icons.shopping_cart_rounded,
+    Icons.subscriptions_rounded,
+    Icons.note_rounded,
+    Icons.center_focus_strong_rounded,
   ];
 
   void _onItemTapped(int index) {
@@ -120,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               child: Text(
-                AppLocalizations.of(context)!.menu,
+                'Menú', // Hardcoded for now
                 style: GoogleFonts.oswald(
                   color: Colors.white,
                   fontSize: 24,

@@ -1,1 +1,141 @@
-\'package:flutter/material.dart\';\nimport \'package:carousel_slider/carousel_slider.dart\';\nimport \'package:flutter_gen/gen_l10n/app_localizations.dart\';\nimport \'package:google_fonts/google_fonts.dart\';\n\nclass DashboardScreen extends StatelessWidget {\n  const DashboardScreen({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    final l10n = AppLocalizations.of(context)!;\n    final quickActions = [\n      _QuickAction(icon: Icons.money_off, title: l10n.debts, color: Colors.red.shade400),\n      _QuickAction(icon: Icons.subscriptions, title: l10n.subscriptions, color: Colors.blue.shade400),\n      _QuickAction(icon: Icons.task, title: l10n.tasks, color: Colors.green.shade400),\n      _QuickAction(icon: Icons.note, title: l10n.notes, color: Colors.orange.shade400),\n      _QuickAction(icon: Icons.timer, title: l10n.pomodoroTimer, color: Colors.purple.shade400),\n    ];\n\n    return Scaffold(\n      body: SingleChildScrollView(\n        padding: const EdgeInsets.all(16.0),\n        child: Column(\n          crossAxisAlignment: CrossAxisAlignment.start,\n          children: [\n            Text(\n              l10n.dashboard,\n              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold),\n            ),\n            const SizedBox(height: 24),\n            _buildSectionTitle(context, \"Acciones Rápidas\"),\n            const SizedBox(height: 16),\n            CarouselSlider.builder(\n              itemCount: quickActions.length,\n              itemBuilder: (context, index, realIndex) {\n                final action = quickActions[index];\n                return _buildQuickActionCard(context, action);\n              },\n              options: CarouselOptions(\n                height: 120,\n                autoPlay: true,\n                autoPlayInterval: const Duration(seconds: 5),\n                enlargeCenterPage: true,\n                viewportFraction: 0.8,\n                aspectRatio: 2.0,\n              ),\n            ),\n            const SizedBox(height: 24),\n            _buildSectionTitle(context, \"Resumen Financiero\"),\n            const SizedBox(height: 16),\n            _buildSummaryCard(\n              context,\n              title: l10n.overduePayments,\n              value: \"\$1,250.00\",\n              icon: Icons.payment,\n              color: Colors.red.shade300,\n            ),\n            const SizedBox(height: 16),\n            _buildSummaryCard(\n              context,\n              title: l10n.dailyExpenses,\n              value: \"\$75.50\",\n              icon: Icons.request_page,\n              color: Colors.orange.shade300,\n            ),\n          ],\n        ),\n      ),\n    );\n  }\n\n  Widget _buildSectionTitle(BuildContext context, String title) {\n    return Text(\n      title,\n      style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w500),\n    );\n  }\n\n  Widget _buildQuickActionCard(BuildContext context, _QuickAction action) {\n    return Card(\n      elevation: 4,\n      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),\n      child: Container(\n        decoration: BoxDecoration(\n          borderRadius: BorderRadius.circular(16),\n          gradient: LinearGradient(\n            colors: [action.color.withOpacity(0.7), action.color],\n            begin: Alignment.topLeft,\n            end: Alignment.bottomRight,\n          ),\n        ),\n        child: Center(\n          child: Column(\n            mainAxisAlignment: MainAxisAlignment.center,\n            children: [\n              Icon(action.icon, size: 36, color: Colors.white),\n              const SizedBox(height: 8),\n              Text(\n                action.title,\n                style: GoogleFonts.roboto(color: Colors.white, fontWeight: FontWeight.bold),\n              ),\n            ],\n          ),\n        ),\n      ),\n    );\n  }\n\n  Widget _buildSummaryCard(BuildContext context, {required String title, required String value, required IconData icon, required Color color}) {\n    return Card(\n      elevation: 4,\n      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),\n      child: Container(\n        padding: const EdgeInsets.all(20),\n        decoration: BoxDecoration(\n          borderRadius: BorderRadius.circular(16),\n          color: Theme.of(context).cardColor,\n        ),\n        child: Row(\n          children: [\n            Icon(icon, size: 40, color: color),\n            const SizedBox(width: 16),\n            Column(\n              crossAxisAlignment: CrossAxisAlignment.start,\n              children: [\n                Text(title, style: GoogleFonts.roboto(fontSize: 16, color: Colors.white70)),\n                const SizedBox(height: 4),\n                Text(value, style: GoogleFonts.oswald(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),\n              ],\n            )\n          ],\n        ),\n      ),\n    );\n  }\n}\n\nclass _QuickAction {\n  final IconData icon;\n  final String title;\n  final Color color;\n\n  _QuickAction({required this.icon, required this.title, required this.color});\n}\n
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+
+import 'package:myapp/providers/income_provider.dart';
+import 'package:myapp/providers/expense_provider.dart';
+import 'package:myapp/providers/subscription_provider.dart';
+import 'package:myapp/providers/debt_provider.dart';
+import 'package:myapp/models/expense.dart';
+
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.dashboard,
+              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
+            _buildSummary(context),
+            const SizedBox(height: 24),
+            _buildSectionTitle(l10n.upcomingSubscriptions),
+            _buildUpcomingSubscriptions(context),
+            const SizedBox(height: 24),
+            _buildSectionTitle(l10n.pendingDebts),
+            _buildPendingDebts(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummary(BuildContext context) {
+    final totalIncome = Provider.of<IncomeProvider>(context).totalIncome;
+    final totalExpenses = Provider.of<ExpenseProvider>(context).expenses.fold(0.0, (sum, item) => sum + item.amount);
+    final balance = totalIncome - totalExpenses;
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildSummaryItem('Ingresos', totalIncome, Colors.green.shade400),
+            _buildSummaryItem('Gastos', totalExpenses, Colors.red.shade400),
+            _buildSummaryItem('Balance', balance, Colors.blue.shade400),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryItem(String title, double amount, Color color) {
+    return Column(
+      children: [
+        Text(title, style: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w500)),
+        const SizedBox(height: 8),
+        Text(
+          NumberFormat.currency(symbol: '€').format(amount),
+          style: GoogleFonts.oswald(fontSize: 20, fontWeight: FontWeight.bold, color: color),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: GoogleFonts.oswald(fontSize: 22, fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget _buildUpcomingSubscriptions(BuildContext context) {
+    final subscriptions = Provider.of<SubscriptionProvider>(context).subscriptions;
+    final upcoming = subscriptions.where((s) => s.nextPaymentDate.isAfter(DateTime.now())).toList();
+
+    if (upcoming.isEmpty) {
+      return const Text('No hay suscripciones próximas.');
+    }
+
+    return _buildCardList(
+      itemCount: upcoming.length > 3 ? 3 : upcoming.length, // Show max 3
+      itemBuilder: (index) {
+        final sub = upcoming[index];
+        return ListTile(
+          leading: const Icon(Icons.autorenew),
+          title: Text(sub.name),
+          trailing: Text(DateFormat.yMMMd().format(sub.nextPaymentDate)),
+        );
+      },
+    );
+  }
+
+  Widget _buildPendingDebts(BuildContext context) {
+    final debts = Provider.of<DebtProvider>(context).debts;
+    final pendingDebts = debts.where((d) => d.isPending).toList();
+
+    if (pendingDebts.isEmpty) {
+      return const Text('No hay deudas pendientes.');
+    }
+
+    return _buildCardList(
+      itemCount: pendingDebts.length > 3 ? 3 : pendingDebts.length, // Show max 3
+      itemBuilder: (index) {
+        final debt = pendingDebts[index];
+        return ListTile(
+          leading: const Icon(Icons.receipt),
+          title: Text(debt.creditor),
+          trailing: Text(NumberFormat.currency(symbol: '€').format(debt.totalAmount)),
+        );
+      },
+    );
+  }
+
+  Widget _buildCardList({required int itemCount, required Widget Function(int) itemBuilder}) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: itemCount,
+        itemBuilder: (context, index) => itemBuilder(index),
+        separatorBuilder: (context, index) => const Divider(height: 1),
+      ),
+    );
+  }
+}

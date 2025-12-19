@@ -1,19 +1,11 @@
 {
   "@@locale": "es",
-  "dashboard": "Panel",
+  "appTitle": "TDAH Organizer",
+  "tasks": "Tareas",
   "debts": "Deudas",
   "subscriptions": "Suscripciones",
-  "overduePayments": "Pagos Atrasados",
-  "dailyExpenses": "Gastos Diarios",
-  "tasks": "Tareas",
-  "reminders": "Recordatorios",
   "notes": "Notas",
-  "habitTracker": "Seguimiento de Hábitos",
-  "achievements": "Logros",
-  "focusMode": "Modo de Enfoque",
-  "pomodoroTimer": "Temporizador Pomodoro",
-  "settings": "Ajustes",
-  "profile": "Perfil",
-  "about": "Acerca de",
-  "menu": "Menú"
+  "expenses": "Gastos",
+  "focus": "Foco",
+  "dashboard": "Dashboard"
 }

@@ -1,36 +1,41 @@
-enum PaymentStatus { pendiente, pagado, atrasado }
+enum PaymentStatus { pagado, pendiente, atrasado, no_aplica }
 
 class Debt {
+  final String id;
   final String creditor;
   final double totalAmount;
-  final double installmentAmount;
+  final int totalInstallments;
   final DateTime startDate;
-  final int numberOfInstallments;
-  // Un mapa para rastrear el estado de cada cuota. La clave es el número de la cuota (ej: 1, 2, 3...)
-  final Map<int, PaymentStatus> payments;
+  final Map<int, PaymentStatus> paymentStatus;
 
   Debt({
+    required this.id,
     required this.creditor,
     required this.totalAmount,
-    required this.installmentAmount,
+    required this.totalInstallments,
     required this.startDate,
-    required this.numberOfInstallments,
-    Map<int, PaymentStatus>? payments,
-  }) : payments = payments ??
-            Map.fromIterables(
-              List.generate(numberOfInstallments, (i) => i + 1),
-              List.generate(numberOfInstallments, (i) => PaymentStatus.pendiente),
-            );
+    Map<int, PaymentStatus>? paymentStatus,
+  }) : paymentStatus = paymentStatus ?? {};
 
-  // Lógica para obtener el estado de una cuota específica
-  PaymentStatus getStatusForInstallment(int installmentNumber) {
-    return payments[installmentNumber] ?? PaymentStatus.pendiente;
+  PaymentStatus getStatusForInstallment(int installment) {
+    return paymentStatus[installment] ?? PaymentStatus.pendiente;
   }
 
-  // Lógica para actualizar el estado de una cuota
-  void updatePaymentStatus(int installmentNumber, PaymentStatus status) {
-    if (payments.containsKey(installmentNumber)) {
-      payments[installmentNumber] = status;
-    }
+  Debt copyWith({
+    String? id,
+    String? creditor,
+    double? totalAmount,
+    int? totalInstallments,
+    DateTime? startDate,
+    Map<int, PaymentStatus>? paymentStatus,
+  }) {
+    return Debt(
+      id: id ?? this.id,
+      creditor: creditor ?? this.creditor,
+      totalAmount: totalAmount ?? this.totalAmount,
+      totalInstallments: totalInstallments ?? this.totalInstallments,
+      startDate: startDate ?? this.startDate,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+    );
   }
 }

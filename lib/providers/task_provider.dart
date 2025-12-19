@@ -1,45 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:tdah_organizer/models/task.dart';
+import 'package:myapp/models/task.dart';
 
 class TaskProvider with ChangeNotifier {
   final List<Task> _tasks = [
     Task(
-      title: "Pagar la tarjeta de crédito",
-      description: "Revisar el estado de cuenta y pagar antes del vencimiento.",
-      priority: TaskPriority.alta,
-      status: TaskStatus.pendiente,
-      dueDate: DateTime.now().add(const Duration(days: 5)),
-      tags: ['finanzas', 'urgente'],
-    ),
+        title: 'Comprar comida para el perro',
+        priority: TaskPriority.alta,
+        dueDate: DateTime.now().add(const Duration(days: 1))),
     Task(
-      title: "Comprar víveres para la semana",
-      description: "Leche, pan, huevos, frutas y verduras.",
-      priority: TaskPriority.media,
-      status: TaskStatus.completada,
-      isCompleted: true, // Keep for compatibility
-      dueDate: DateTime.now().subtract(const Duration(days: 1)),
-      tags: ['hogar'],
-    ),
+        title: 'Llamar al banco',
+        priority: TaskPriority.media,
+        status: TaskStatus.en_progreso,
+        dueDate: DateTime.now()),
     Task(
-      title: "Llamar al médico para cita",
-      description: "Agendar chequeo anual.",
-      priority: TaskPriority.media,
-      status: TaskStatus.enProgreso,
-      tags: ['salud'],
-    ),
+        title: 'Terminar el informe de ventas',
+        priority: TaskPriority.alta,
+        description: 'Incluir gráficos del último trimestre.'),
     Task(
-      title: "Terminar el informe del proyecto X",
-      description: "Completar la sección de análisis y enviar a revisión.",
-      priority: TaskPriority.alta,
-      status: TaskStatus.pendiente,
-      dueDate: DateTime.now().add(const Duration(days: 2)),
-      tags: ['trabajo', 'proyecto'],
-    ),
-    Task(
-      title: "Hacer ejercicio 30 minutos",
+      title: 'Pagar la factura de la luz',
       priority: TaskPriority.baja,
-      status: TaskStatus.pendiente,
-      tags: ['salud', 'rutina'],
+      status: TaskStatus.completada,
     ),
   ];
 
@@ -47,6 +27,7 @@ class TaskProvider with ChangeNotifier {
 
   void addTask(Task task) {
     _tasks.add(task);
+    _sortTasks();
     notifyListeners();
   }
 
@@ -54,6 +35,7 @@ class TaskProvider with ChangeNotifier {
     final index = _tasks.indexOf(oldTask);
     if (index != -1) {
       _tasks[index] = newTask;
+      _sortTasks();
       notifyListeners();
     }
   }
@@ -64,22 +46,31 @@ class TaskProvider with ChangeNotifier {
   }
 
   void toggleTaskStatus(Task task) {
-    final index = _tasks.indexOf(task);
-    if (index != -1) {
-      final currentTask = _tasks[index];
-      final newStatus = currentTask.status == TaskStatus.completada
-          ? TaskStatus.pendiente
-          : TaskStatus.completada;
+    final newStatus = task.status == TaskStatus.completada
+        ? TaskStatus.pendiente
+        : TaskStatus.completada;
+    final updatedTask = task.copyWith(status: newStatus);
+    updateTask(task, updatedTask);
+  }
 
-      _tasks[index] = Task(
-          title: currentTask.title,
-          description: currentTask.description,
-          priority: currentTask.priority,
-          status: newStatus,
-          dueDate: currentTask.dueDate,
-          tags: currentTask.tags,
-          isCompleted: newStatus == TaskStatus.completada);
-      notifyListeners();
-    }
+  void _sortTasks() {
+    _tasks.sort((a, b) {
+      // Completadas van al final
+      if (a.status == TaskStatus.completada && b.status != TaskStatus.completada) return 1;
+      if (a.status != TaskStatus.completada && b.status == TaskStatus.completada) return -1;
+
+      // Luego por prioridad
+      if (a.priority.index < b.priority.index) return -1;
+      if (a.priority.index > b.priority.index) return 1;
+
+      // Finalmente por fecha de entrega (las más próximas primero)
+      if (a.dueDate != null && b.dueDate != null) {
+        return a.dueDate!.compareTo(b.dueDate!);
+      }
+      if (a.dueDate != null) return -1; // Tareas con fecha van antes
+      if (b.dueDate != null) return 1;
+
+      return 0;
+    });
   }
 }

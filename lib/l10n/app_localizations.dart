@@ -94,11 +94,17 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[Locale('es')];
 
-  /// No description provided for @dashboard.
+  /// No description provided for @appTitle.
   ///
   /// In es, this message translates to:
-  /// **'Panel'**
-  String get dashboard;
+  /// **'TDAH Organizer'**
+  String get appTitle;
+
+  /// No description provided for @tasks.
+  ///
+  /// In es, this message translates to:
+  /// **'Tareas'**
+  String get tasks;
 
   /// No description provided for @debts.
   ///
@@ -112,83 +118,29 @@ abstract class AppLocalizations {
   /// **'Suscripciones'**
   String get subscriptions;
 
-  /// No description provided for @overduePayments.
-  ///
-  /// In es, this message translates to:
-  /// **'Pagos Atrasados'**
-  String get overduePayments;
-
-  /// No description provided for @dailyExpenses.
-  ///
-  /// In es, this message translates to:
-  /// **'Gastos Diarios'**
-  String get dailyExpenses;
-
-  /// No description provided for @tasks.
-  ///
-  /// In es, this message translates to:
-  /// **'Tareas'**
-  String get tasks;
-
-  /// No description provided for @reminders.
-  ///
-  /// In es, this message translates to:
-  /// **'Recordatorios'**
-  String get reminders;
-
   /// No description provided for @notes.
   ///
   /// In es, this message translates to:
   /// **'Notas'**
   String get notes;
 
-  /// No description provided for @habitTracker.
+  /// No description provided for @expenses.
   ///
   /// In es, this message translates to:
-  /// **'Seguimiento de Hábitos'**
-  String get habitTracker;
+  /// **'Gastos'**
+  String get expenses;
 
-  /// No description provided for @achievements.
+  /// No description provided for @focus.
   ///
   /// In es, this message translates to:
-  /// **'Logros'**
-  String get achievements;
+  /// **'Foco'**
+  String get focus;
 
-  /// No description provided for @focusMode.
+  /// No description provided for @dashboard.
   ///
   /// In es, this message translates to:
-  /// **'Modo de Enfoque'**
-  String get focusMode;
-
-  /// No description provided for @pomodoroTimer.
-  ///
-  /// In es, this message translates to:
-  /// **'Temporizador Pomodoro'**
-  String get pomodoroTimer;
-
-  /// No description provided for @settings.
-  ///
-  /// In es, this message translates to:
-  /// **'Ajustes'**
-  String get settings;
-
-  /// No description provided for @profile.
-  ///
-  /// In es, this message translates to:
-  /// **'Perfil'**
-  String get profile;
-
-  /// No description provided for @about.
-  ///
-  /// In es, this message translates to:
-  /// **'Acerca de'**
-  String get about;
-
-  /// No description provided for @menu.
-  ///
-  /// In es, this message translates to:
-  /// **'Menú'**
-  String get menu;
+  /// **'Dashboard'**
+  String get dashboard;
 }
 
 class _AppLocalizationsDelegate

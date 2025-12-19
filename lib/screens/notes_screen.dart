@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tdah_organizer/models/note.dart';
-import 'package:tdah_organizer/providers/note_provider.dart';
-import 'package:tdah_organizer/widgets/add_note_form.dart';
+import 'package:myapp/models/note.dart';
+import 'package:myapp/providers/note_provider.dart';
+import 'package:myapp/widgets/add_note_form.dart';
 
 class NotesScreen extends StatelessWidget {
   const NotesScreen({super.key});
 
-  void _showAddNoteForm(BuildContext context) {
+  void _showNoteForm(BuildContext context, {Note? note}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -18,10 +18,17 @@ class NotesScreen extends StatelessWidget {
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          child: AddNoteForm(onAdd: (title, content) {
-            final newNote = Note(title: title, content: content);
-            Provider.of<NoteProvider>(context, listen: false).addNote(newNote);
-          }),
+          child: AddNoteForm(
+            note: note,
+            onSave: (newNote) {
+              final provider = Provider.of<NoteProvider>(context, listen: false);
+              if (note == null) {
+                provider.addNote(newNote);
+              } else {
+                provider.updateNote(note, newNote);
+              }
+            },
+          ),
         );
       },
     );
@@ -45,6 +52,14 @@ class NotesScreen extends StatelessWidget {
             Expanded(
               child: Consumer<NoteProvider>(
                 builder: (context, noteProvider, child) {
+                  if (noteProvider.notes.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No tienes notas guardadas.',
+                        style: GoogleFonts.roboto(fontSize: 18, color: Colors.white70),
+                      ),
+                    );
+                  }
                   return ListView.builder(
                     itemCount: noteProvider.notes.length,
                     itemBuilder: (context, index) {
@@ -59,7 +74,7 @@ class NotesScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddNoteForm(context),
+        onPressed: () => _showNoteForm(context),
         child: const Icon(Icons.add),
         tooltip: "Añadir Nota",
       ),
@@ -68,29 +83,29 @@ class NotesScreen extends StatelessWidget {
 
   Widget _buildNoteCard(BuildContext context, Note note) {
     return Card(
-      elevation: 4,
+      elevation: 2,
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Theme.of(context).cardColor,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        title: Text(note.title, style: GoogleFonts.roboto(fontWeight: FontWeight.bold)),
+        subtitle: Text(note.content, maxLines: 2, overflow: TextOverflow.ellipsis),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              note.title,
-              style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.white70),
+              onPressed: () => _showNoteForm(context, note: note),
             ),
-            const SizedBox(height: 12),
-            Text(
-              note.content,
-              style: GoogleFonts.roboto(fontSize: 16, color: Colors.white70),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.white70),
+              onPressed: () {
+                Provider.of<NoteProvider>(context, listen: false).deleteNote(note);
+              },
             ),
           ],
         ),
+        onTap: () => _showNoteForm(context, note: note),
       ),
     );
   }

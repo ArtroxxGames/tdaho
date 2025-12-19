@@ -9,7 +9,10 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
-  String get dashboard => 'Panel';
+  String get appTitle => 'TDAH Organizer';
+
+  @override
+  String get tasks => 'Tareas';
 
   @override
   String get debts => 'Deudas';
@@ -18,41 +21,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get subscriptions => 'Suscripciones';
 
   @override
-  String get overduePayments => 'Pagos Atrasados';
-
-  @override
-  String get dailyExpenses => 'Gastos Diarios';
-
-  @override
-  String get tasks => 'Tareas';
-
-  @override
-  String get reminders => 'Recordatorios';
-
-  @override
   String get notes => 'Notas';
 
   @override
-  String get habitTracker => 'Seguimiento de Hábitos';
+  String get expenses => 'Gastos';
 
   @override
-  String get achievements => 'Logros';
+  String get focus => 'Foco';
 
   @override
-  String get focusMode => 'Modo de Enfoque';
-
-  @override
-  String get pomodoroTimer => 'Temporizador Pomodoro';
-
-  @override
-  String get settings => 'Ajustes';
-
-  @override
-  String get profile => 'Perfil';
-
-  @override
-  String get about => 'Acerca de';
-
-  @override
-  String get menu => 'Menú';
+  String get dashboard => 'Dashboard';
 }

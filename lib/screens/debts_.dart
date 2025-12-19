@@ -90,8 +90,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showDebtForm(context),
-        child: const Icon(Icons.add),
         tooltip: "Añadir Deuda",
+        child: const Icon(Icons.add),
       ),
     );
   }

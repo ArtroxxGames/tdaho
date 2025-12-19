@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:tdah_organizer/models/debt.dart';
+import 'package:myapp/models/debt.dart';
 
 class DebtProvider with ChangeNotifier {
   final List<Debt> _debts = [
     Debt(
-      creditor: "Tarjeta de Crédito Visa",
-      totalAmount: 1200.00,
-      installmentAmount: 100.00,
+      id: '1',
+      creditor: 'Banco Principal',
+      totalAmount: 12000,
+      totalInstallments: 12,
       startDate: DateTime(2023, 1, 15),
-      numberOfInstallments: 12,
-      payments: {
+      paymentStatus: {
         1: PaymentStatus.pagado,
         2: PaymentStatus.pagado,
-        3: PaymentStatus.pagado,
-        4: PaymentStatus.atrasado,
-        5: PaymentStatus.pendiente,
+        3: PaymentStatus.atrasado,
+        4: PaymentStatus.pendiente,
       },
     ),
     Debt(
-      creditor: "Préstamo Automotriz",
-      totalAmount: 8000.00,
-      installmentAmount: 250.00,
-      startDate: DateTime(2023, 2, 1),
-      numberOfInstallments: 32,
-    ),
-    Debt(
-      creditor: "Crédito de Consumo",
-      totalAmount: 1500.00,
-      installmentAmount: 125.00,
-      startDate: DateTime(2023, 4, 20),
-      numberOfInstallments: 12,
+      id: '2',
+      creditor: 'Tienda de Electrónica',
+      totalAmount: 800,
+      totalInstallments: 6,
+      startDate: DateTime(2023, 3, 1),
+       paymentStatus: {
+        1: PaymentStatus.pagado,
+        2: PaymentStatus.pagado,
+        3: PaymentStatus.pagado,
+        4: PaymentStatus.pagado,
+      },
     ),
   ];
 
@@ -48,15 +46,12 @@ class DebtProvider with ChangeNotifier {
     }
   }
 
-  void deleteDebt(Debt debt) {
-    _debts.remove(debt);
-    notifyListeners();
-  }
-
-  void updatePaymentStatus(Debt debt, int installmentNumber, PaymentStatus status) {
+  void updatePaymentStatus(Debt debt, int installment, PaymentStatus status) {
     final debtIndex = _debts.indexOf(debt);
     if (debtIndex != -1) {
-      _debts[debtIndex].updatePaymentStatus(installmentNumber, status);
+      final newStatus = Map<int, PaymentStatus>.from(debt.paymentStatus);
+      newStatus[installment] = status;
+      _debts[debtIndex] = debt.copyWith(paymentStatus: newStatus);
       notifyListeners();
     }
   }

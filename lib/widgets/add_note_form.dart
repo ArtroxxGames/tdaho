@@ -1,1 +1,86 @@
-import \'package:flutter/material.dart\';\nimport \'package:google_fonts/google_fonts.dart\';\n\nclass AddNoteForm extends StatefulWidget {\n  final void Function(String, String) onAdd;\n\n  const AddNoteForm({required this.onAdd, super.key});\n\n  @override\n  _AddNoteFormState createState() => _AddNoteFormState();\n}\n\nclass _AddNoteFormState extends State<AddNoteForm> {\n  final _formKey = GlobalKey<FormState>();\n  final _titleController = TextEditingController();\n  final _contentController = TextEditingController();\n\n  @override\n  Widget build(BuildContext context) {\n    return Padding(\n      padding: const EdgeInsets.all(20.0),\n      child: Form(\n        key: _formKey,\n        child: Column(\n          mainAxisSize: MainAxisSize.min,\n          children: [\n            Text(\'Añadir Nueva Nota\', style: GoogleFonts.oswald(fontSize: 24, fontWeight: FontWeight.bold)),\n            const SizedBox(height: 20),\n            TextFormField(\n              controller: _titleController,\n              decoration: const InputDecoration(labelText: \'Título\'),\n              validator: (value) {\n                if (value == null || value.isEmpty) {\n                  return \'Por favor, introduce un título\';\n                }\n                return null;\n              },\n            ),\n            const SizedBox(height: 12),\n            TextFormField(\n              controller: _contentController,\n              decoration: const InputDecoration(labelText: \'Contenido\'),\n              maxLines: 3,\n              validator: (value) {\n                if (value == null || value.isEmpty) {\n                  return \'Por favor, introduce contenido\';\n                }\n                return null;\n              },\n            ),\n            const SizedBox(height: 20),\n            ElevatedButton(\n              onPressed: _submitForm,\n              child: const Text(\'Añadir Nota\'),\n            ),\n          ],\n        ),\n      ),\n    );\n  }\n\n  void _submitForm() {\n    if (_formKey.currentState!.validate()) {\n      widget.onAdd(_titleController.text, _contentController.text);\n      Navigator.of(context).pop();\n    }\n  }\n}\n
+import 'package:flutter/material.dart';
+import 'package:myapp/models/note.dart';
+
+class AddNoteForm extends StatefulWidget {
+  final Note? note;
+  final Function(Note) onSave;
+
+  const AddNoteForm({super.key, this.note, required this.onSave});
+
+  @override
+  _AddNoteFormState createState() => _AddNoteFormState();
+}
+
+class _AddNoteFormState extends State<AddNoteForm> {
+  final _formKey = GlobalKey<FormState>();
+  late String _title;
+  late String _content;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.note != null) {
+      _title = widget.note!.title;
+      _content = widget.note!.content;
+    } else {
+      _title = '';
+      _content = '';
+    }
+  }
+
+  void _saveForm() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      final newNote = Note(
+        id: widget.note?.id ?? DateTime.now().toString(),
+        title: _title,
+        content: _content,
+      );
+      widget.onSave(newNote);
+      Navigator.of(context).pop();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              initialValue: _title,
+              decoration: const InputDecoration(labelText: 'Título'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, introduce un título';
+                }
+                return null;
+              },
+              onSaved: (value) => _title = value!,
+            ),
+            TextFormField(
+              initialValue: _content,
+              decoration: const InputDecoration(labelText: 'Contenido'),
+              maxLines: 5,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, introduce contenido';
+                }
+                return null;
+              },
+              onSaved: (value) => _content = value!,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _saveForm,
+              child: const Text('Guardar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tdah_organizer/providers/debt_provider.dart';
-import 'package:tdah_organizer/providers/note_provider.dart';
-import 'package:tdah_organizer/providers/subscription_provider.dart';
-import 'package:tdah_organizer/providers/task_provider.dart';
-import 'package:tdah_organizer/screens/home_screen.dart';
-import 'package:tdah_organizer/theme/app_theme.dart';
+import 'package:myapp/providers/debt_provider.dart';
+import 'package:myapp/providers/expense_provider.dart';
+import 'package:myapp/providers/note_provider.dart';
+import 'package:myapp/providers/subscription_provider.dart';
+import 'package:myapp/providers/task_provider.dart';
+import 'package:myapp/home_screen.dart';
+import 'package:myapp/theme/app_theme.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -15,24 +16,14 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => DebtProvider()),
+        ChangeNotifierProvider(create: (context) => ExpenseProvider()),
+        ChangeNotifierProvider(create: (context) => NoteProvider()),
         ChangeNotifierProvider(create: (context) => SubscriptionProvider()),
         ChangeNotifierProvider(create: (context) => TaskProvider()),
-        ChangeNotifierProvider(create: (context) => NoteProvider()),
       ],
       child: const TDAHOrganizerApp(),
     ),
   );
-}
-
-class ThemeProvider with ChangeNotifier {
-  ThemeMode _themeMode = ThemeMode.dark;
-
-  ThemeMode get themeMode => _themeMode;
-
-  void toggleTheme() {
-    _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
-    notifyListeners();
-  }
 }
 
 class TDAHOrganizerApp extends StatelessWidget {
@@ -44,7 +35,7 @@ class TDAHOrganizerApp extends StatelessWidget {
       builder: (context, themeProvider, child) {
         return MaterialApp(
           title: 'TDAH Organizer',
-          theme: AppTheme.darkTheme,
+          theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeProvider.themeMode,
           localizationsDelegates: const [
@@ -53,9 +44,7 @@ class TDAHOrganizerApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('es'),
-          ],
+          supportedLocales: AppLocalizations.supportedLocales,
           home: const HomeScreen(),
         );
       },

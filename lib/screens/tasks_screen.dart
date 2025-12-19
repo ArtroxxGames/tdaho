@@ -3,9 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tdah_organizer/models/task.dart';
-import 'package:tdah_organizer/providers/task_provider.dart';
-import 'package:tdah_organizer/widgets/add_task_form.dart';
+import 'package:myapp/models/task.dart';
+import 'package:myapp/providers/task_provider.dart';
+import 'package:myapp/widgets/add_task_form.dart';
 
 class TasksScreen extends StatelessWidget {
   const TasksScreen({super.key});
@@ -53,6 +53,14 @@ class TasksScreen extends StatelessWidget {
             Expanded(
               child: Consumer<TaskProvider>(
                 builder: (context, taskProvider, child) {
+                  if (taskProvider.tasks.isEmpty) {
+                    return Center(
+                      child: Text(
+                        '¡No tienes tareas pendientes!',
+                        style: GoogleFonts.roboto(fontSize: 18, color: Colors.white70),
+                      ),
+                    );
+                  }
                   return ListView.builder(
                     itemCount: taskProvider.tasks.length,
                     itemBuilder: (context, index) {
@@ -67,9 +75,9 @@ class TasksScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        tooltip: "Añadir Tarea",
         onPressed: () => _showTaskForm(context),
         child: const Icon(Icons.add),
-        tooltip: "Añadir Tarea",
       ),
     );
   }
@@ -82,8 +90,6 @@ class TasksScreen extends StatelessWidget {
         return Colors.orange.shade300;
       case TaskPriority.baja:
         return Colors.blue.shade300;
-      default:
-        return Colors.grey;
     }
   }
 

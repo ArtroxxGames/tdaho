@@ -1,24 +1,41 @@
+import 'package:flutter/material.dart';
 
-enum TaskPriority { baja, media, alta }
+enum TaskPriority { alta, media, baja }
 
-enum TaskStatus { pendiente, enProgreso, completada }
+enum TaskStatus { pendiente, en_progreso, completada }
 
 class Task {
+  final String id;
   final String title;
   final String? description;
+  final DateTime? dueDate;
   final TaskPriority priority;
   final TaskStatus status;
-  final DateTime? dueDate;
-  final List<String> tags;
-  bool isCompleted; // This will be replaced by status
 
   Task({
+    String? id,
     required this.title,
     this.description,
+    this.dueDate,
     this.priority = TaskPriority.media,
     this.status = TaskStatus.pendiente,
-    this.dueDate,
-    this.tags = const [],
-    this.isCompleted = false, // Keep for now for backward compatibility
-  });
+  }) : id = id ?? UniqueKey().toString();
+
+  Task copyWith({
+    String? id,
+    String? title,
+    String? description,
+    DateTime? dueDate,
+    TaskPriority? priority,
+    TaskStatus? status,
+  }) {
+    return Task(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      dueDate: dueDate ?? this.dueDate,
+      priority: priority ?? this.priority,
+      status: status ?? this.status,
+    );
+  }
 }

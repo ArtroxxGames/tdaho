@@ -1,1 +1,128 @@
-import \'package:flutter/material.dart\';\nimport \'package:google_fonts/google_fonts.dart\';\nimport \'package:intl/intl.dart\';\n\nclass AddSubscriptionForm extends StatefulWidget {\n  final void Function(String, double, DateTime) onAdd;\n\n  const AddSubscriptionForm({required this.onAdd, super.key});\n\n  @override\n  _AddSubscriptionFormState createState() => _AddSubscriptionFormState();\n}\n\nclass _AddSubscriptionFormState extends State<AddSubscriptionForm> {\n  final _formKey = GlobalKey<FormState>();\n  final _nameController = TextEditingController();\n  final _amountController = TextEditingController();\n  DateTime? _selectedDate;\n\n  @override\n  Widget build(BuildContext context) {\n    return Padding(\n      padding: const EdgeInsets.all(20.0),\n      child: Form(\n        key: _formKey,\n        child: Column(\n          mainAxisSize: MainAxisSize.min,\n          children: [\n            Text(\'Añadir Nueva Suscripción\', style: GoogleFonts.oswald(fontSize: 24, fontWeight: FontWeight.bold)),\n            const SizedBox(height: 20),\n            TextFormField(\n              controller: _nameController,\n              decoration: const InputDecoration(labelText: \'Nombre\'),\n              validator: (value) {\n                if (value == null || value.isEmpty) {\n                  return \'Por favor, introduce un nombre\';\n                }\n                return null;\n              },\n            ),\n            const SizedBox(height: 12),\n            TextFormField(\n              controller: _amountController,\n              decoration: const InputDecoration(labelText: \'Importe\'),\n              keyboardType: TextInputType.number,\n              validator: (value) {\n                if (value == null || double.tryParse(value) == null) {\n                  return \'Por favor, introduce un importe válido\';\n                }\n                return null;\n              },\n            ),\n            const SizedBox(height: 12),\n            Row(\n              children: [\n                Expanded(\n                  child: Text(\n                    _selectedDate == null\n                        ? \'Sin fecha de facturación\'\n                        : \'Próximo cobro: ${DateFormat.yMd().format(_selectedDate!)}\',\n                  ),\n                ),\n                TextButton(\n                  onPressed: _presentDatePicker,\n                  child: const Text(\'Elegir Fecha\'),\n                ),\n              ],\n            ),\n            const SizedBox(height: 20),\n            ElevatedButton(\n              onPressed: _submitForm,\n              child: const Text(\'Añadir Suscripción\'),\n            ),\n          ],\n        ),\n      ),\n    );\n  }\n\n  void _presentDatePicker() {\n    showDatePicker(\n      context: context,\n      initialDate: DateTime.now(),\n      firstDate: DateTime.now(),\n      lastDate: DateTime.now().add(const Duration(days: 365 * 10)),\n    ).then((pickedDate) {\n      if (pickedDate == null) {\n        return;\n      }\n      setState(() {\n        _selectedDate = pickedDate;\n      });\n    });\n  }\n\n  void _submitForm() {\n    if (_formKey.currentState!.validate() && _selectedDate != null) {\n      widget.onAdd(\n        _nameController.text,\n        double.parse(_amountController.text),\n        _selectedDate!,\n      );\n      Navigator.of(context).pop();\n    }\n  }\n}\n
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:myapp/models/subscription.dart';
+
+class AddSubscriptionForm extends StatefulWidget {
+  final Subscription? subscription;
+  final Function(Subscription) onSave;
+
+  const AddSubscriptionForm({super.key, this.subscription, required this.onSave});
+
+  @override
+  _AddSubscriptionFormState createState() => _AddSubscriptionFormState();
+}
+
+class _AddSubscriptionFormState extends State<AddSubscriptionForm> {
+  final _formKey = GlobalKey<FormState>();
+  late String _name;
+  late double _amount;
+  late BillingCycle _billingCycle;
+  late DateTime _nextPaymentDate;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.subscription != null) {
+      _name = widget.subscription!.name;
+      _amount = widget.subscription!.amount;
+      _billingCycle = widget.subscription!.billingCycle;
+      _nextPaymentDate = widget.subscription!.nextPaymentDate;
+    } else {
+      _name = '';
+      _amount = 0.0;
+      _billingCycle = BillingCycle.mensual;
+      _nextPaymentDate = DateTime.now();
+    }
+  }
+
+  void _saveForm() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      final newSubscription = Subscription(
+        id: widget.subscription?.id ?? DateTime.now().toString(),
+        name: _name,
+        amount: _amount,
+        billingCycle: _billingCycle,
+        nextPaymentDate: _nextPaymentDate,
+      );
+      widget.onSave(newSubscription);
+      Navigator.of(context).pop();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              initialValue: _name,
+              decoration: const InputDecoration(labelText: 'Nombre'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, introduce un nombre';
+                }
+                return null;
+              },
+              onSaved: (value) => _name = value!,
+            ),
+            TextFormField(
+              initialValue: _amount.toString(),
+              decoration: const InputDecoration(labelText: 'Monto'),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || double.tryParse(value) == null) {
+                  return 'Por favor, introduce un monto válido';
+                }
+                return null;
+              },
+              onSaved: (value) => _amount = double.parse(value!),
+            ),
+            DropdownButtonFormField<BillingCycle>(
+              value: _billingCycle,
+              items: BillingCycle.values.map((cycle) {
+                return DropdownMenuItem(
+                  value: cycle,
+                  child: Text(cycle.name),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _billingCycle = value!;
+                });
+              },
+              decoration: const InputDecoration(labelText: 'Ciclo de Facturación'),
+            ),
+            ListTile(
+              title: Text(
+                  'Próximo Pago: ${DateFormat.yMMMd().format(_nextPaymentDate)}'),
+              trailing: const Icon(Icons.calendar_today),
+              onTap: () async {
+                final pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: _nextPaymentDate,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2101),
+                );
+                if (pickedDate != null) {
+                  setState(() {
+                    _nextPaymentDate = pickedDate;
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _saveForm,
+              child: const Text('Guardar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -1,1 +1,124 @@
-import \'package:flutter/material.dart\';\nimport \'package:google_fonts/google_fonts.dart\';\nimport \'package:intl/intl.dart\';\nimport \'package:tdah_organizer/models/debt.dart\';\n\nclass AddDebtForm extends StatefulWidget {\n  final Debt? debt; // Deuda existente para editar\n  final Function(Debt) onSave; // Callback que devuelve la deuda completa\n\n  const AddDebtForm({required this.onSave, this.debt, super.key});\n\n  @override\n  _AddDebtFormState createState() => _AddDebtFormState();\n}\n\nclass _AddDebtFormState extends State<AddDebtForm> {\n  final _formKey = GlobalKey<FormState>();\n\n  late TextEditingController _creditorController;\n  late TextEditingController _totalAmountController;\n  late TextEditingController _installmentAmountController;\n  late TextEditingController _installmentsController;\n  DateTime? _selectedStartDate;\n\n  bool get isEditing => widget.debt != null;\n\n  @override\n  void initState() {\n    super.initState();\n    final debt = widget.debt;\n\n    _creditorController = TextEditingController(text: debt?.creditor ?? \'\');\n    _totalAmountController = TextEditingController(text: debt?.totalAmount.toString() ?? \'\');\n    _installmentAmountController = TextEditingController(text: debt?.installmentAmount.toString() ?? \'\');\n    _installmentsController = TextEditingController(text: debt?.numberOfInstallments.toString() ?? \'\');\n    _selectedStartDate = debt?.startDate;\n  }\n\n  @override\n  Widget build(BuildContext context) {\n    return Padding(\n      padding: const EdgeInsets.all(24.0),\n      child: Form(\n        key: _formKey,\n        child: SingleChildScrollView(\n          child: Column(\n            mainAxisSize: MainAxisSize.min,\n            children: [\n              Text(\n                isEditing ? \'Editar Deuda\' : \'Añadir Nueva Deuda\',\n                style: GoogleFonts.oswald(fontSize: 24, fontWeight: FontWeight.bold),\n              ),\n              const SizedBox(height: 20),\n              TextFormField(\n                controller: _creditorController,\n                decoration: const InputDecoration(labelText: \'Acreedor\'),\n                validator: (value) => (value == null || value.isEmpty)\n                    ? \'Introduce el nombre del acreedor\'\n                    : null,\n              ),\n              const SizedBox(height: 16),\n              Row(\n                children: [\n                  Expanded(\n                    child: TextFormField(\n                      controller: _totalAmountController,\n                      decoration: const InputDecoration(labelText: \'Monto Total\', prefixText: \'\$\'),\n                      keyboardType: TextInputType.number,\n                      validator: (value) => (double.tryParse(value ?? \'\') == null)\n                          ? \'Inválido\'\n                          : null,\n                    ),\n                  ),\n                  const SizedBox(width: 16),\n                  Expanded(\n                    child: TextFormField(\n                      controller: _installmentAmountController,\n                      decoration: const InputDecoration(labelText: \'Monto Cuota\', prefixText: \'\$\'),\n                      keyboardType: TextInputType.number,\n                      validator: (value) => (double.tryParse(value ?? \'\') == null)\n                          ? \'Inválido\'\n                          : null,\n                    ),\n                  ),\n                ],\n              ),\n              const SizedBox(height: 16),\n              TextFormField(\n                controller: _installmentsController,\n                decoration: const InputDecoration(labelText: \'Número de Cuotas\'),\n                keyboardType: TextInputType.number,\n                 validator: (value) => (int.tryParse(value ?? \'\') == null)\n                      ? \'Inválido\'\n                      : null,\n              ),\n              const SizedBox(height: 20),\n              Row(\n                children: [\n                  Expanded(\n                    child: Text(\n                      _selectedStartDate == null\n                          ? \'Sin fecha de inicio\'\n                          : \'Inicia el: ${DateFormat.yMd().format(_selectedStartDate!)}\',\n                      style: GoogleFonts.roboto(fontSize: 16),\n                    ),\n                  ),\n                  IconButton(\n                    icon: const Icon(Icons.calendar_month),\n                    onPressed: _pickDate,\n                    tooltip: \'Seleccionar Fecha de Inicio\',\n                  ),\n                ],\n              ),\n              const SizedBox(height: 24),\n              ElevatedButton(\n                onPressed: _submitForm,\n                child: Text(isEditing ? \'Guardar Cambios\' : \'Añadir Deuda\'),\n              ),\n            ],\n          ),\n        ),\n      ),\n    );\n  }\n\n  Future<void> _pickDate() async {\n    final pickedDate = await showDatePicker(\n      context: context,\n      initialDate: _selectedStartDate ?? DateTime.now(),\n      firstDate: DateTime(2000),\n      lastDate: DateTime(2100),\n    );\n    if (pickedDate != null && pickedDate != _selectedStartDate) {\n      setState(() => _selectedStartDate = pickedDate);\n    }\n  }\n\n  void _submitForm() {\n    if (_formKey.currentState!.validate() && _selectedStartDate != null) {\n      final savedDebt = Debt(\n        creditor: _creditorController.text,\n        totalAmount: double.parse(_totalAmountController.text),\n        installmentAmount: double.parse(_installmentAmountController.text),\n        startDate: _selectedStartDate!,\n        numberOfInstallments: int.parse(_installmentsController.text),\n      );\n\n      widget.onSave(savedDebt);\n      Navigator.of(context).pop();\n    }\n  }\n}\n
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:myapp/models/debt.dart';
+
+class AddDebtForm extends StatefulWidget {
+  final Debt? debt;
+  final Function(Debt) onSave;
+
+  const AddDebtForm({super.key, this.debt, required this.onSave});
+
+  @override
+  _AddDebtFormState createState() => _AddDebtFormState();
+}
+
+class _AddDebtFormState extends State<AddDebtForm> {
+  final _formKey = GlobalKey<FormState>();
+  late String _creditor;
+  late double _totalAmount;
+  late int _totalInstallments;
+  late DateTime _startDate;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.debt != null) {
+      _creditor = widget.debt!.creditor;
+      _totalAmount = widget.debt!.totalAmount;
+      _totalInstallments = widget.debt!.totalInstallments;
+      _startDate = widget.debt!.startDate;
+    } else {
+      _creditor = '';
+      _totalAmount = 0.0;
+      _totalInstallments = 1;
+      _startDate = DateTime.now();
+    }
+  }
+
+  void _saveForm() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      final newDebt = Debt(
+        id: widget.debt?.id ?? DateTime.now().toString(),
+        creditor: _creditor,
+        totalAmount: _totalAmount,
+        totalInstallments: _totalInstallments,
+        startDate: _startDate,
+      );
+      widget.onSave(newDebt);
+      Navigator.of(context).pop();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              initialValue: _creditor,
+              decoration: const InputDecoration(labelText: 'Acreedor'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Por favor, introduce un acreedor';
+                }
+                return null;
+              },
+              onSaved: (value) => _creditor = value!,
+            ),
+            TextFormField(
+              initialValue: _totalAmount.toString(),
+              decoration: const InputDecoration(labelText: 'Monto Total'),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || double.tryParse(value) == null) {
+                  return 'Por favor, introduce un monto válido';
+                }
+                return null;
+              },
+              onSaved: (value) => _totalAmount = double.parse(value!),
+            ),
+            TextFormField(
+              initialValue: _totalInstallments.toString(),
+              decoration: const InputDecoration(labelText: 'Total de Cuotas'),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || int.tryParse(value) == null) {
+                  return 'Por favor, introduce un número válido de cuotas';
+                }
+                return null;
+              },
+              onSaved: (value) => _totalInstallments = int.parse(value!),
+            ),
+            ListTile(
+              title: Text('Fecha de Inicio: ${DateFormat.yMMMd().format(_startDate)}'),
+              trailing: const Icon(Icons.calendar_today),
+              onTap: () async {
+                final pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: _startDate,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2101),
+                );
+                if (pickedDate != null) {
+                  setState(() {
+                    _startDate = pickedDate;
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _saveForm,
+              child: const Text('Guardar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
