@@ -1,1 +1,108 @@
-\'package:flutter/material.dart\';\nimport \'package:flutter_gen/gen_l10n/app_localizations.dart\';\nimport \'package:google_fonts/google_fonts.dart\';\n\nclass DebtsScreen extends StatelessWidget {\n  const DebtsScreen({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    final l10n = AppLocalizations.of(context)!;\n    final debts = [\n      _Debt(creditor: \"Banco Principal\", amount: 1250.00, dueDate: DateTime.now().add(const Duration(days: 10))),\n      _Debt(creditor: \"Tarjeta de Crédito\", amount: 750.50, dueDate: DateTime.now().add(const Duration(days: 25))),\n      _Debt(creditor: \"Préstamo Estudiantil\", amount: 5000.00, dueDate: DateTime.now().add(const Duration(days: 60))),\n      _Debt(creditor: \"Compra a Plazos\", amount: 300.00, dueDate: DateTime.now().add(const Duration(days: 5))),\n    ];\n\n    return Scaffold(\n      body: Padding(\n        padding: const EdgeInsets.all(16.0),\n        child: Column(\n          crossAxisAlignment: CrossAxisAlignment.start,\n          children: [\n            Text(\n              l10n.debts,\n              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold),\n            ),\n            const SizedBox(height: 24),\n            Expanded(\n              child: ListView.builder(\n                itemCount: debts.length,\n                itemBuilder: (context, index) {\n                  final debt = debts[index];\n                  return _buildDebtCard(context, debt);\n                },\n              ),\n            ),\n          ],\n        ),\n      ),\n      floatingActionButton: FloatingActionButton(\n        onPressed: () {\n          // TODO: Implementar la funcionalidad para añadir una nueva deuda\n        },\n        child: const Icon(Icons.add),\n        tooltip: \"Añadir Deuda\",\n      ),\n    );\n  }\n\n  Widget _buildDebtCard(BuildContext context, _Debt debt) {\n    return Card(\n      elevation: 4,\n      margin: const EdgeInsets.only(bottom: 16),\n      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),\n      child: Container(\n        padding: const EdgeInsets.all(20),\n        decoration: BoxDecoration(\n          borderRadius: BorderRadius.circular(16),\n          color: Theme.of(context).cardColor,\n        ),\n        child: Column(\n          crossAxisAlignment: CrossAxisAlignment.start,\n          children: [\n            Text(\n              debt.creditor,\n              style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),\n            ),\n            const SizedBox(height: 12),\n            Text(\n              \"\$${debt.amount.toStringAsFixed(2)}\",\n              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.red.shade300),\n            ),\n            const SizedBox(height: 8),\n            Row(\n              children: [\n                Icon(Icons.calendar_today, size: 16, color: Colors.white70),\n                const SizedBox(width: 8),\n                Text(\n                  \"Vence el ${debt.dueDate.day}/${debt.dueDate.month}/${debt.dueDate.year}\",\n                  style: GoogleFonts.roboto(fontSize: 14, color: Colors.white70),\n                ),\n              ],\n            ),\n          ],\n        ),\n      ),\n    );\n  }\n}\n\nclass _Debt {\n  final String creditor;\n  final double amount;\n  final DateTime dueDate;\n\n  _Debt({required this.creditor, required this.amount, required this.dueDate});\n}\n
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:tdah_organizer/models/debt.dart';
+import 'package:tdah_organizer/providers/debt_provider.dart';
+import 'package:tdah_organizer/widgets/add_debt_form.dart';
+
+class DebtsScreen extends StatelessWidget {
+  const DebtsScreen({super.key});
+
+  void _showAddDebtForm(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: AddDebtForm(onAdd: (creditor, amount, dueDate) {
+            final newDebt = Debt(creditor: creditor, amount: amount, dueDate: dueDate);
+            Provider.of<DebtProvider>(context, listen: false).addDebt(newDebt);
+          }),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.debts,
+              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
+            Expanded(
+              child: Consumer<DebtProvider>(
+                builder: (context, debtProvider, child) {
+                  return ListView.builder(
+                    itemCount: debtProvider.debts.length,
+                    itemBuilder: (context, index) {
+                      final debt = debtProvider.debts[index];
+                      return _buildDebtCard(context, debt);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddDebtForm(context),
+        child: const Icon(Icons.add),
+        tooltip: "Añadir Deuda",
+      ),
+    );
+  }
+
+  Widget _buildDebtCard(BuildContext context, Debt debt) {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Theme.of(context).cardColor,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              debt.creditor,
+              style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "\$${debt.amount.toStringAsFixed(2)}",
+              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.red.shade300),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.calendar_today, size: 16, color: Colors.white70),
+                const SizedBox(width: 8),
+                Text(
+                  "Vence el ${debt.dueDate.day}/${debt.dueDate.month}/${debt.dueDate.year}",
+                  style: GoogleFonts.roboto(fontSize: 14, color: Colors.white70),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

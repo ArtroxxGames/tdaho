@@ -1,0 +1,1 @@
+class Subscription {\n  final String name;\n  final double amount;\n  final DateTime nextBilling;\n\n  Subscription({required this.name, required this.amount, required this.nextBilling});\n}\n

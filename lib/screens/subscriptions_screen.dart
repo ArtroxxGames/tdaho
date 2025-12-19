@@ -1,1 +1,108 @@
-\'package:flutter/material.dart\';\nimport \'package:flutter_gen/gen_l10n/app_localizations.dart\';\nimport \'package:google_fonts/google_fonts.dart\';\n\nclass SubscriptionsScreen extends StatelessWidget {\n  const SubscriptionsScreen({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    final l10n = AppLocalizations.of(context)!;\n    final subscriptions = [\n      _Subscription(name: \"Netflix\", amount: 15.99, nextBilling: DateTime.now().add(const Duration(days: 10))),\n      _Subscription(name: \"Spotify\", amount: 9.99, nextBilling: DateTime.now().add(const Duration(days: 15))),\n      _Subscription(name: \"Adobe Creative Cloud\", amount: 52.99, nextBilling: DateTime.now().add(const Duration(days: 20))),\n      _Subscription(name: \"Amazon Prime\", amount: 14.99, nextBilling: DateTime.now().add(const Duration(days: 5))),\n    ];\n\n    return Scaffold(\n      body: Padding(\n        padding: const EdgeInsets.all(16.0),\n        child: Column(\n          crossAxisAlignment: CrossAxisAlignment.start,\n          children: [\n            Text(\n              l10n.subscriptions,\n              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold),\n            ),\n            const SizedBox(height: 24),\n            Expanded(\n              child: ListView.builder(\n                itemCount: subscriptions.length,\n                itemBuilder: (context, index) {\n                  final subscription = subscriptions[index];\n                  return _buildSubscriptionCard(context, subscription);\n                },\n              ),\n            ),\n          ],\n        ),\n      ),\n      floatingActionButton: FloatingActionButton(\n        onPressed: () {\n          // TODO: Implementar la funcionalidad para añadir una nueva suscripción\n        },\n        child: const Icon(Icons.add),\n        tooltip: \"Añadir Suscripción\",\n      ),\n    );\n  }\n\n  Widget _buildSubscriptionCard(BuildContext context, _Subscription subscription) {\n    return Card(\n      elevation: 4,\n      margin: const EdgeInsets.only(bottom: 16),\n      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),\n      child: Container(\n        padding: const EdgeInsets.all(20),\n        decoration: BoxDecoration(\n          borderRadius: BorderRadius.circular(16),\n          color: Theme.of(context).cardColor,\n        ),\n        child: Column(\n          crossAxisAlignment: CrossAxisAlignment.start,\n          children: [\n            Text(\n              subscription.name,\n              style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),\n            ),\n            const SizedBox(height: 12),\n            Text(\n              \"\$${subscription.amount.toStringAsFixed(2)}\" / mes\",\n              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.blue.shade300),\n            ),\n            const SizedBox(height: 8),\n            Row(\n              children: [\n                Icon(Icons.calendar_today, size: 16, color: Colors.white70),\n                const SizedBox(width: 8),\n                Text(\n                  \"Próximo cobro: ${subscription.nextBilling.day}/${subscription.nextBilling.month}/${subscription.nextBilling.year}\",\n                  style: GoogleFonts.roboto(fontSize: 14, color: Colors.white70),\n                ),\n              ],\n            ),\n          ],\n        ),\n      ),\n    );\n  }\n}\n\nclass _Subscription {\n  final String name;\n  final double amount;\n  final DateTime nextBilling;\n\n  _Subscription({required this.name, required this.amount, required this.nextBilling});\n}\n
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:tdah_organizer/models/subscription.dart';
+import 'package:tdah_organizer/providers/subscription_provider.dart';
+import 'package:tdah_organizer/widgets/add_subscription_form.dart';
+
+class SubscriptionsScreen extends StatelessWidget {
+  const SubscriptionsScreen({super.key});
+
+  void _showAddSubscriptionForm(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: AddSubscriptionForm(onAdd: (name, amount, nextBilling) {
+            final newSubscription = Subscription(name: name, amount: amount, nextBilling: nextBilling);
+            Provider.of<SubscriptionProvider>(context, listen: false).addSubscription(newSubscription);
+          }),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.subscriptions,
+              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
+            Expanded(
+              child: Consumer<SubscriptionProvider>(
+                builder: (context, subscriptionProvider, child) {
+                  return ListView.builder(
+                    itemCount: subscriptionProvider.subscriptions.length,
+                    itemBuilder: (context, index) {
+                      final subscription = subscriptionProvider.subscriptions[index];
+                      return _buildSubscriptionCard(context, subscription);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddSubscriptionForm(context),
+        child: const Icon(Icons.add),
+        tooltip: "Añadir Suscripción",
+      ),
+    );
+  }
+
+  Widget _buildSubscriptionCard(BuildContext context, Subscription subscription) {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Theme.of(context).cardColor,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              subscription.name,
+              style: GoogleFonts.roboto(fontSize: 20, fontWeight: FontWeight.w500, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "\$${subscription.amount.toStringAsFixed(2)} / mes",
+              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.blue.shade300),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.calendar_today, size: 16, color: Colors.white70),
+                const SizedBox(width: 8),
+                Text(
+                  "Próximo cobro: ${subscription.nextBilling.day}/${subscription.nextBilling.month}/${subscription.nextBilling.year}",
+                  style: GoogleFonts.roboto(fontSize: 14, color: Colors.white70),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

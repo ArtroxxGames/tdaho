@@ -29,37 +29,31 @@
 - [x] **Integrar el Layout**: Reemplazar la pantalla de bienvenida en `main.dart` con el nuevo layout, permitiendo la navegación entre las diferentes pantallas.
 - [x] **Internacionalización (i18n)**: Configurar la app para soportar múltiples idiomas (español).
 
-**Fase 3: Implementación de la Pantalla "Dashboard" (Completada)**
+**Fase 3: Maquetación de Pantallas y Funcionalidad Básica (Completada)**
 
-- [x] **Diseñar la Interfaz del Dashboard**: Se ha creado un layout visualmente atractivo y funcional.
-- [x] **Crear Widgets Reutilizables**: Se han desarrollado widgets para el carrusel de acciones rápidas y las tarjetas de resumen.
-- [x] **Carrusel de Acciones Rápidas**: Se ha implementado un carrusel funcional para acceder a las secciones principales.
-- [x] **Integrar Datos de Muestra**: La pantalla del dashboard ahora muestra datos ficticios para simular el uso real.
-- [ ] **Añadir Gráficos (Opcional)**: Integrar gráficos simples para visualizar datos financieros o de productividad.
+- [x] **Dashboard**: Interfaz atractiva, carrusel de acciones rápidas y datos de muestra.
+- [x] **Deudas**: Interfaz clara, widget de tarjeta de deuda y formulario de creación.
+- [x] **Suscripciones**: Interfaz clara, widget de tarjeta de suscripción y formulario de creación.
+- [x] **Tareas**: Interfaz de gestión de tareas con checkboxes y formulario de creación.
+- [x] **Notas**: Interfaz de lista de notas y formulario de creación.
+- [x] **Enfoque**: Temporizador Pomodoro funcional.
 
 ## Plan de Implementación Actual
 
-### Fase 4: Implementación de la Pantalla "Deudas" (Completada)
+### Fase 4: Refactorización de la Gestión de Estado con Provider (En Progreso)
 
-- [x] **Diseñar la Interfaz de Deudas**: Se ha creado un layout claro para mostrar la lista de deudas.
-- [x] **Crear Widget de Tarjeta de Deuda**: Se ha desarrollado un widget para mostrar la información de cada deuda.
-- [x] **Integrar Datos de Muestra**: La pantalla de deudas ahora muestra datos ficticios.
-- [ ] **Implementar Formulario de "Añadir Deuda"**: Crear el formulario y la lógica para añadir nuevas deudas (actualmente es un TODO).
+El estado de la aplicación se gestiona actualmente de forma local en cada pantalla, lo que impide la persistencia y el intercambio de datos. Esta fase se centra en centralizar la gestión del estado utilizando el paquete `provider`.
 
-### Fase 5: Implementación de la Pantalla "Suscripciones" (Completada)
-
-- [x] **Diseñar la Interfaz de Suscripciones**: Se ha creado un layout para mostrar la lista de suscripciones.
-- [x] **Crear Widget de Tarjeta de Suscripción**: Se ha desarrollado un widget para mostrar la información de cada suscripción.
-- [x] **Integrar Datos de Muestra**: La pantalla de suscripciones ahora muestra datos ficticios.
-- [ ] **Implementar Formulario de "Añadir Suscripción"**: Crear el formulario y la lógica para añadir nuevas suscripciones (actualmente es un TODO).
-
-### Fase 6: Implementación de la Pantalla "Tareas" (Completada)
-
-- [x] **Diseñar la Interfaz de Tareas**: Se ha creado un layout para gestionar tareas con checkboxes.
-- [x] **Crear Widget de Tarjeta de Tarea**: Se ha desarrollado un widget para cada tarea.
-- [x] **Integrar Datos de Muestra**: La pantalla de tareas ahora muestra datos ficticios.
-- [ ] **Implementar Formulario de "Añadir Tarea"**: Crear el formulario y la lógica para añadir nuevas tareas (actualmente es un TODO).
+- [ ] **Crear Modelos de Datos**: Mover las clases de datos a una nueva carpeta `lib/models`.
+- [ ] **Crear Proveedores (`ChangeNotifier`)**: Crear un `ChangeNotifier` para cada modelo de datos en una nueva carpeta `lib/providers`.
+- [ ] **Integrar `MultiProvider`**: En `main.dart`, envolver la aplicación con `MultiProvider` para hacer accesibles los proveedores en todo el árbol de widgets.
+- [ ] **Refactorizar las Pantallas**: Actualizar cada pantalla para consumir los datos desde su `provider` correspondiente en lugar de gestionar un estado local.
+- [ ] **Refactorizar los Formularios**: Conectar los formularios de creación para que utilicen los métodos de los `providers` para añadir nuevos datos.
 
 ### Próximos Pasos
 
-El siguiente paso es continuar con la implementación de las demás pantallas, comenzando por la de **"Notas"**. Esta sección permitirá a los usuarios crear y gestionar notas de texto.
+Una vez que la gestión del estado esté centralizada, los siguientes pasos serán:
+
+1.  **Persistencia de Datos**: Integrar una solución de almacenamiento local (como `shared_preferences` o una base de datos como `Hive` o `Isar`) para que los datos persistan entre sesiones.
+2.  **Lógica de Negocio Avanzada**: Implementar funcionalidades más complejas, como la edición y eliminación de elementos, notificaciones, y cálculos en el dashboard.
+3.  **Añadir Gráficos (Opcional)**: Integrar gráficos simples para visualizar datos financieros o de productividad en el dashboard.

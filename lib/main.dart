@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:myapp/theme/app_theme.dart';
-import 'package:myapp/home_screen.dart';
+import 'package:tdah_organizer/providers/debt_provider.dart';
+import 'package:tdah_organizer/providers/note_provider.dart';
+import 'package:tdah_organizer/providers/subscription_provider.dart';
+import 'package:tdah_organizer/providers/task_provider.dart';
+import 'package:tdah_organizer/screens/home_screen.dart';
+import 'package:tdah_organizer/theme/app_theme.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => DebtProvider()),
+        ChangeNotifierProvider(create: (context) => SubscriptionProvider()),
+        ChangeNotifierProvider(create: (context) => TaskProvider()),
+        ChangeNotifierProvider(create: (context) => NoteProvider()),
+      ],
       child: const TDAHOrganizerApp(),
     ),
   );

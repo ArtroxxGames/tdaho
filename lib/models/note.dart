@@ -1,0 +1,1 @@
+class Note {\n  final String title;\n  final String content;\n\n  Note({required this.title, required this.content});\n}\n

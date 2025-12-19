@@ -1,0 +1,1 @@
+class Task {\n  final String title;\n  bool isCompleted;\n\n  Task({required this.title, this.isCompleted = false});\n}\n

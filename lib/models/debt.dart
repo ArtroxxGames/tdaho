@@ -1,0 +1,1 @@
+class Debt {\n  final String creditor;\n  final double amount;\n  final DateTime dueDate;\n\n  Debt({required this.creditor, required this.amount, required this.dueDate});\n}\n
