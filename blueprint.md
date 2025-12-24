@@ -40,20 +40,37 @@
 
 ## Plan de Implementación Actual
 
-### Fase 4: Refactorización de la Gestión de Estado con Provider (En Progreso)
+### Fase 4: Refactorización de la Gestión de Estado con Provider (✅ Completada)
 
-El estado de la aplicación se gestiona actualmente de forma local en cada pantalla, lo que impide la persistencia y el intercambio de datos. Esta fase se centra en centralizar la gestión del estado utilizando el paquete `provider`.
+- [x] **Crear Modelos de Datos**: Mover las clases de datos a una nueva carpeta `lib/models`.
+- [x] **Crear Proveedores (`ChangeNotifier`)**: Crear un `ChangeNotifier` para cada modelo de datos en una nueva carpeta `lib/providers`.
+- [x] **Integrar `MultiProvider`**: En `main.dart`, envolver la aplicación con `MultiProvider` para hacer accesibles los proveedores en todo el árbol de widgets.
+- [x] **Refactorizar las Pantallas**: Actualizar cada pantalla para consumir los datos desde su `provider` correspondiente en lugar de gestionar un estado local.
+- [x] **Refactorizar los Formularios**: Conectar los formularios de creación para que utilicen los métodos de los `providers` para añadir nuevos datos.
 
-- [ ] **Crear Modelos de Datos**: Mover las clases de datos a una nueva carpeta `lib/models`.
-- [ ] **Crear Proveedores (`ChangeNotifier`)**: Crear un `ChangeNotifier` para cada modelo de datos en una nueva carpeta `lib/providers`.
-- [ ] **Integrar `MultiProvider`**: En `main.dart`, envolver la aplicación con `MultiProvider` para hacer accesibles los proveedores en todo el árbol de widgets.
-- [ ] **Refactorizar las Pantallas**: Actualizar cada pantalla para consumir los datos desde su `provider` correspondiente en lugar de gestionar un estado local.
-- [ ] **Refactorizar los Formularios**: Conectar los formularios de creación para que utilicen los métodos de los `providers` para añadir nuevos datos.
+### Fase 5: Sistema de Moneda y Configuración (✅ Completada)
+
+- [x] **SettingsProvider**: Sistema de gestión de moneda configurable (PYG por defecto)
+- [x] **CurrencyFormatter**: Utilidad para formatear monedas en toda la app
+- [x] **Pantalla de Configuración**: Completa con estadísticas, tipo de cambio, y zona de peligro
+- [x] **Persistencia de Configuración**: Implementada con `shared_preferences`
+
+### Fase 6: Funcionalidades Financieras Core (🔄 En Progreso)
+
+- [x] **Tarjetas de Crédito**: Modelo, Provider y Pantalla completa
+  - [x] Modelo `CreditCard` con todos los campos necesarios
+  - [x] Provider con cálculos de resumen mensual
+  - [x] Pantalla principal con cards expandibles
+  - [x] Formulario crear/editar tarjeta
+  - [x] Integración con ExpenseProvider para gastos asociados
+  - [x] Cálculo de cuotas y disponible
+- [ ] **Pagos Atrasados**: Modelo, Provider y Pantalla (Próximo)
+- [ ] **Mejoras al Dashboard**: Cards de resumen completos según documentación
 
 ### Próximos Pasos
 
-Una vez que la gestión del estado esté centralizada, los siguientes pasos serán:
-
-1.  **Persistencia de Datos**: Integrar una solución de almacenamiento local (como `shared_preferences` o una base de datos como `Hive` o `Isar`) para que los datos persistan entre sesiones.
-2.  **Lógica de Negocio Avanzada**: Implementar funcionalidades más complejas, como la edición y eliminación de elementos, notificaciones, y cálculos en el dashboard.
-3.  **Añadir Gráficos (Opcional)**: Integrar gráficos simples para visualizar datos financieros o de productividad en el dashboard.
+1.  **Pagos Atrasados**: Implementar modelo, provider y pantalla completa
+2.  **Mejoras al Dashboard**: Agregar cards de resumen completos y acciones rápidas
+3.  **Persistencia de Datos**: Integrar Hive o Isar para persistencia local de todos los datos
+4.  **Cursos & Educación**: Implementar módulo completo con vista lista y calendario
+5.  **Tareas Kanban**: Mejorar con drag & drop y vista Kanban completa

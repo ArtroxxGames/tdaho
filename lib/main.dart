@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:myapp/providers/credit_card_provider.dart';
 import 'package:myapp/providers/debt_provider.dart';
 import 'package:myapp/providers/expense_provider.dart';
 import 'package:myapp/providers/income_provider.dart';
@@ -18,6 +19,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => SettingsProvider()),
+        ChangeNotifierProvider(create: (context) => CreditCardProvider()),
         ChangeNotifierProvider(create: (context) => DebtProvider()),
         ChangeNotifierProvider(create: (context) => ExpenseProvider()),
         ChangeNotifierProvider(create: (context) => IncomeProvider()),

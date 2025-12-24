@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:myapp/screens/credit_cards_screen.dart';
 import 'package:myapp/screens/dashboard_screen.dart';
 import 'package:myapp/screens/debts_screen.dart';
 import 'package:myapp/screens/expenses_screen.dart';
@@ -24,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const DebtsScreen(),
     const ExpensesScreen(),
     const SubscriptionsScreen(),
+    const CreditCardsScreen(),
     const NotesScreen(),
     const FocusModeScreen(),
     const SettingsScreen(),
@@ -36,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       l10n.debts,
       l10n.expenses,
       l10n.subscriptions,
+      'Tarjetas',
       l10n.notes,
       l10n.focus,
       'Configuración',
@@ -47,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Icons.credit_card_rounded,
     Icons.shopping_cart_rounded,
     Icons.subscriptions_rounded,
+    Icons.account_balance_wallet_rounded,
     Icons.note_rounded,
     Icons.center_focus_strong_rounded,
     Icons.settings_rounded,
