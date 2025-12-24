@@ -5,6 +5,7 @@ import 'package:myapp/providers/debt_provider.dart';
 import 'package:myapp/providers/expense_provider.dart';
 import 'package:myapp/providers/income_provider.dart';
 import 'package:myapp/providers/note_provider.dart';
+import 'package:myapp/providers/overdue_payment_provider.dart';
 import 'package:myapp/providers/settings_provider.dart';
 import 'package:myapp/providers/subscription_provider.dart';
 import 'package:myapp/providers/task_provider.dart';
@@ -24,6 +25,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => ExpenseProvider()),
         ChangeNotifierProvider(create: (context) => IncomeProvider()),
         ChangeNotifierProvider(create: (context) => NoteProvider()),
+        ChangeNotifierProvider(create: (context) => OverduePaymentProvider()),
         ChangeNotifierProvider(create: (context) => SubscriptionProvider()),
         ChangeNotifierProvider(create: (context) => TaskProvider()),
       ],

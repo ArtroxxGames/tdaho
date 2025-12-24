@@ -55,7 +55,7 @@
 - [x] **Pantalla de Configuración**: Completa con estadísticas, tipo de cambio, y zona de peligro
 - [x] **Persistencia de Configuración**: Implementada con `shared_preferences`
 
-### Fase 6: Funcionalidades Financieras Core (🔄 En Progreso)
+### Fase 6: Funcionalidades Financieras Core (✅ Completada)
 
 - [x] **Tarjetas de Crédito**: Modelo, Provider y Pantalla completa
   - [x] Modelo `CreditCard` con todos los campos necesarios
@@ -64,8 +64,20 @@
   - [x] Formulario crear/editar tarjeta
   - [x] Integración con ExpenseProvider para gastos asociados
   - [x] Cálculo de cuotas y disponible
-- [ ] **Pagos Atrasados**: Modelo, Provider y Pantalla (Próximo)
-- [ ] **Mejoras al Dashboard**: Cards de resumen completos según documentación
+- [x] **Pagos Atrasados**: Modelo, Provider y Pantalla completa
+  - [x] Modelo `OverduePayment` con cálculo de días de atraso
+  - [x] Provider con detección automática desde deudas
+  - [x] Pantalla principal con cards de resumen
+  - [x] Formulario registrar/editar atraso
+  - [x] Resumen por concepto
+  - [x] Estado "Todo al día" cuando no hay atrasos
+- [x] **Mejoras al Dashboard**: Cards de resumen completos según documentación
+  - [x] Header con saludo y fecha
+  - [x] 4 Cards de resumen (Cuotas, Suscripciones, Pagos Atrasados, Gastos de Hoy)
+  - [x] Card Total Gastos Fijos Mensuales con gradiente
+  - [x] Sección Productividad (Tareas y Educación)
+  - [x] Acciones Rápidas (grid responsive)
+  - [x] Tip del Día con mensajes motivacionales TDAH
 
 ### Próximos Pasos
 

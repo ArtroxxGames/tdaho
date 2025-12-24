@@ -4,6 +4,7 @@ import 'package:myapp/screens/credit_cards_screen.dart';
 import 'package:myapp/screens/dashboard_screen.dart';
 import 'package:myapp/screens/debts_screen.dart';
 import 'package:myapp/screens/expenses_screen.dart';
+import 'package:myapp/screens/overdue_payments_screen.dart';
 import 'package:myapp/screens/subscriptions_screen.dart';
 import 'package:myapp/screens/notes_screen.dart';
 import 'package:myapp/screens/focus_mode_screen.dart';
@@ -26,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const ExpensesScreen(),
     const SubscriptionsScreen(),
     const CreditCardsScreen(),
+    const OverduePaymentsScreen(),
     const NotesScreen(),
     const FocusModeScreen(),
     const SettingsScreen(),
@@ -39,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       l10n.expenses,
       l10n.subscriptions,
       'Tarjetas',
+      'Pagos Atrasados',
       l10n.notes,
       l10n.focus,
       'Configuración',
@@ -51,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Icons.shopping_cart_rounded,
     Icons.subscriptions_rounded,
     Icons.account_balance_wallet_rounded,
+    Icons.warning_rounded,
     Icons.note_rounded,
     Icons.center_focus_strong_rounded,
     Icons.settings_rounded,
