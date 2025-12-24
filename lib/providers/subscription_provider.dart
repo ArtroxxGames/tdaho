@@ -51,4 +51,9 @@ class SubscriptionProvider with ChangeNotifier {
   void _sortSubscriptions() {
     _subscriptions.sort((a, b) => a.nextPaymentDate.compareTo(b.nextPaymentDate));
   }
+
+  void deleteAll() {
+    _subscriptions.clear();
+    notifyListeners();
+  }
 }

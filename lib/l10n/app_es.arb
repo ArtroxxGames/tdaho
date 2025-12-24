@@ -7,5 +7,10 @@
   "notes": "Notas",
   "expenses": "Gastos",
   "focus": "Foco",
-  "dashboard": "Dashboard"
+  "dashboard": "Dashboard",
+  "start": "Iniciar",
+  "pause": "Pausar",
+  "reset": "Reiniciar",
+  "upcomingSubscriptions": "Suscripciones Próximas",
+  "pendingDebts": "Deudas Pendientes"
 }

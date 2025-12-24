@@ -141,6 +141,36 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Dashboard'**
   String get dashboard;
+
+  /// No description provided for @start.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar'**
+  String get start;
+
+  /// No description provided for @pause.
+  ///
+  /// In es, this message translates to:
+  /// **'Pausar'**
+  String get pause;
+
+  /// No description provided for @reset.
+  ///
+  /// In es, this message translates to:
+  /// **'Reiniciar'**
+  String get reset;
+
+  /// No description provided for @upcomingSubscriptions.
+  ///
+  /// In es, this message translates to:
+  /// **'Suscripciones Próximas'**
+  String get upcomingSubscriptions;
+
+  /// No description provided for @pendingDebts.
+  ///
+  /// In es, this message translates to:
+  /// **'Deudas Pendientes'**
+  String get pendingDebts;
 }
 
 class _AppLocalizationsDelegate

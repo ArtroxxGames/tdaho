@@ -55,4 +55,9 @@ class DebtProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void deleteAll() {
+    _debts.clear();
+    notifyListeners();
+  }
 }

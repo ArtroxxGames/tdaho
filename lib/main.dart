@@ -2,21 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:myapp/providers/debt_provider.dart';
 import 'package:myapp/providers/expense_provider.dart';
+import 'package:myapp/providers/income_provider.dart';
 import 'package:myapp/providers/note_provider.dart';
+import 'package:myapp/providers/settings_provider.dart';
 import 'package:myapp/providers/subscription_provider.dart';
 import 'package:myapp/providers/task_provider.dart';
 import 'package:myapp/home_screen.dart';
 import 'package:myapp/theme/app_theme.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:myapp/l10n/app_localizations.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => SettingsProvider()),
         ChangeNotifierProvider(create: (context) => DebtProvider()),
         ChangeNotifierProvider(create: (context) => ExpenseProvider()),
+        ChangeNotifierProvider(create: (context) => IncomeProvider()),
         ChangeNotifierProvider(create: (context) => NoteProvider()),
         ChangeNotifierProvider(create: (context) => SubscriptionProvider()),
         ChangeNotifierProvider(create: (context) => TaskProvider()),
@@ -38,7 +42,7 @@ class TDAHOrganizerApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeProvider.themeMode,
-          localizationsDelegates: const [
+          localizationsDelegates: [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,

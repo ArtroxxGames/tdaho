@@ -1,1 +1,145 @@
-import \'dart:async\';\nimport \'package:flutter/material.dart\';\nimport \'package:flutter_gen/gen_l10n/app_localizations.dart\';\nimport \'package:google_fonts/google_fonts.dart\';\n\nclass FocusScreen extends StatefulWidget {\n  const FocusScreen({super.key});\n\n  @override\n  _FocusScreenState createState() => _FocusScreenState();\n}\n\nclass _FocusScreenState extends State<FocusScreen> {\n  static const int _pomodoroDuration = 25 * 60; // 25 minutos\n  Timer? _timer;\n  int _remainingTime = _pomodoroDuration;\n  bool _isRunning = false;\n\n  @override\n  void dispose() {\n    _timer?.cancel();\n    super.dispose();\n  }\n\n  void _startTimer() {\n    if (_isRunning) return;\n    setState(() {\n      _isRunning = true;\n    });\n    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {\n      setState(() {\n        if (_remainingTime > 0) {\n          _remainingTime--;\n        } else {\n          _timer?.cancel();\n          _isRunning = false;\n          // TODO: Implementar una notificación o sonido para indicar el final del Pomodoro\n        }\n      });\n    });\n  }\n\n  void _pauseTimer() {\n    if (!_isRunning) return;\n    _timer?.cancel();\n    setState(() {\n      _isRunning = false;\n    });\n  }\n\n  void _resetTimer() {\n    _timer?.cancel();\n    setState(() {\n      _remainingTime = _pomodoroDuration;\n      _isRunning = false;\n    });\n  }\n\n  String get _formattedTime {\n    final minutes = (_remainingTime / 60).floor().toString().padLeft(2, \'0\');\n    final seconds = (_remainingTime % 60).toString().padLeft(2, \'0\');\n    return \'$minutes:$seconds\';\n  }\n\n  @override\n  Widget build(BuildContext context) {\n    final l10n = AppLocalizations.of(context)!;\n\n    return Scaffold(\n      body: Padding(\n        padding: const EdgeInsets.all(16.0),\n        child: Column(\n          mainAxisAlignment: MainAxisAlignment.center,\n          children: [\n            Text(\n              l10n.focus,\n              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold),\n            ),\n            const SizedBox(height: 48),\n            _buildTimerDisplay(),\n            const SizedBox(height: 48),\n            _buildTimerControls(l10n),\n          ],\n        ),\n      ),\n    );\n  }\n\n  Widget _buildTimerDisplay() {\n    return SizedBox(\n      width: 250,\n      height: 250,\n      child: Stack(\n        fit: StackFit.expand,\n        children: [\n          CircularProgressIndicator(\n            value: _remainingTime / _pomodoroDuration,\n            strokeWidth: 12,\n            backgroundColor: Colors.grey.shade800,\n            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade300),\n          ),\n          Center(\n            child: Text(\n              _formattedTime,\n              style: GoogleFonts.oswald(fontSize: 64, fontWeight: FontWeight.bold, color: Colors.white),\n            ),\n          ),\n        ],\n      ),\n    );\n  }\n\n  Widget _buildTimerControls(AppLocalizations l10n) {\n    return Row(\n      mainAxisAlignment: MainAxisAlignment.center,\n      children: [\n        if (!_isRunning)\n          ElevatedButton(\n            onPressed: _startTimer,\n            child: Text(l10n.start),\n            style: ElevatedButton.styleFrom(\n              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),\n            ),\n          )\n        else\n          ElevatedButton(\n            onPressed: _pauseTimer,\n            child: Text(l10n.pause),\n            style: ElevatedButton.styleFrom(\n              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),\n            ),\n          ),\n        const SizedBox(width: 24),\n        ElevatedButton(\n          onPressed: _resetTimer,\n          child: Text(l10n.reset),\n          style: ElevatedButton.styleFrom(\n            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),\n            backgroundColor: Colors.red.shade400,\n          ),\n        ),\n      ],\n    );\n  }\n}\n
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:myapp/l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class FocusScreen extends StatefulWidget {
+  const FocusScreen({super.key});
+
+  @override
+  _FocusScreenState createState() => _FocusScreenState();
+}
+
+class _FocusScreenState extends State<FocusScreen> {
+  static const int _pomodoroDuration = 25 * 60; // 25 minutos
+  Timer? _timer;
+  int _remainingTime = _pomodoroDuration;
+  bool _isRunning = false;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    if (_isRunning) return;
+    setState(() {
+      _isRunning = true;
+    });
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_remainingTime > 0) {
+          _remainingTime--;
+        } else {
+          _timer?.cancel();
+          _isRunning = false;
+          // TODO: Implementar una notificación o sonido para indicar el final del Pomodoro
+        }
+      });
+    });
+  }
+
+  void _pauseTimer() {
+    if (!_isRunning) return;
+    _timer?.cancel();
+    setState(() {
+      _isRunning = false;
+    });
+  }
+
+  void _resetTimer() {
+    _timer?.cancel();
+    setState(() {
+      _remainingTime = _pomodoroDuration;
+      _isRunning = false;
+    });
+  }
+
+  String get _formattedTime {
+    final minutes = (_remainingTime / 60).floor().toString().padLeft(2, '0');
+    final seconds = (_remainingTime % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              l10n.focus,
+              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 48),
+            _buildTimerDisplay(),
+            const SizedBox(height: 48),
+            _buildTimerControls(l10n),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimerDisplay() {
+    return SizedBox(
+      width: 250,
+      height: 250,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          CircularProgressIndicator(
+            value: _remainingTime / _pomodoroDuration,
+            strokeWidth: 12,
+            backgroundColor: Colors.grey.shade800,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade300),
+          ),
+          Center(
+            child: Text(
+              _formattedTime,
+              style: GoogleFonts.oswald(fontSize: 64, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimerControls(AppLocalizations l10n) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (!_isRunning)
+          ElevatedButton(
+            onPressed: _startTimer,
+            child: Text(l10n.start),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            ),
+          )
+        else
+          ElevatedButton(
+            onPressed: _pauseTimer,
+            child: Text(l10n.pause),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            ),
+          ),
+        const SizedBox(width: 24),
+        ElevatedButton(
+          onPressed: _resetTimer,
+          child: Text(l10n.reset),
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            backgroundColor: Colors.red.shade400,
+          ),
+        ),
+      ],
+    );
+  }
+}

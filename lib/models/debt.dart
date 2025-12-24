@@ -21,6 +21,11 @@ class Debt {
     return paymentStatus[installment] ?? PaymentStatus.pendiente;
   }
 
+  bool get isPending {
+    return paymentStatus.values.any((status) => status == PaymentStatus.pendiente) ||
+           paymentStatus.isEmpty;
+  }
+
   Debt copyWith({
     String? id,
     String? creditor,

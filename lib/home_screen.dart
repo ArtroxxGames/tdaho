@@ -6,7 +6,8 @@ import 'package:myapp/screens/expenses_screen.dart';
 import 'package:myapp/screens/subscriptions_screen.dart';
 import 'package:myapp/screens/notes_screen.dart';
 import 'package:myapp/screens/focus_mode_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:myapp/screens/settings_screen.dart';
+import 'package:myapp/l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const SubscriptionsScreen(),
     const NotesScreen(),
     const FocusModeScreen(),
+    const SettingsScreen(),
   ];
 
   List<String> _getScreenTitles(BuildContext context) {
@@ -36,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       l10n.subscriptions,
       l10n.notes,
       l10n.focus,
+      'Configuración',
     ];
   }
 
@@ -46,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Icons.subscriptions_rounded,
     Icons.note_rounded,
     Icons.center_focus_strong_rounded,
+    Icons.settings_rounded,
   ];
 
   void _onItemTapped(int index) {

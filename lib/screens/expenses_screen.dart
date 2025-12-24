@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:myapp/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 import 'package:myapp/models/expense.dart';
 import 'package:myapp/providers/expense_provider.dart';
+import 'package:myapp/providers/settings_provider.dart';
+import 'package:myapp/utils/currency_formatter.dart';
 import 'package:myapp/widgets/add_expense_form.dart';
 
 class ExpensesScreen extends StatefulWidget {
@@ -152,7 +154,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: _getCategoryColor(expense.category),
-              child: _getCategoryIcon(expense.category),
+              child: Icon(_getCategoryIcon(expense.category)),
             ),
             title: Text(expense.description, style: GoogleFonts.roboto(fontWeight: FontWeight.w500)),
             subtitle: Text(DateFormat.yMMMd().format(expense.date)),
@@ -160,7 +162,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  NumberFormat.currency(symbol: '€').format(expense.amount),
+                  CurrencyFormatter.format(expense.amount, settings: Provider.of<SettingsProvider>(context)),
                   style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
                 ),
                 IconButton(

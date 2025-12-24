@@ -31,4 +31,19 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dashboard => 'Dashboard';
+
+  @override
+  String get start => 'Iniciar';
+
+  @override
+  String get pause => 'Pausar';
+
+  @override
+  String get reset => 'Reiniciar';
+
+  @override
+  String get upcomingSubscriptions => 'Suscripciones Próximas';
+
+  @override
+  String get pendingDebts => 'Deudas Pendientes';
 }

@@ -39,4 +39,9 @@ class ExpenseProvider with ChangeNotifier {
     _expenses.remove(expense);
     notifyListeners();
   }
+
+  void deleteAll() {
+    _expenses.clear();
+    notifyListeners();
+  }
 }

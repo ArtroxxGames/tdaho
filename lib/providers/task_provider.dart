@@ -73,4 +73,9 @@ class TaskProvider with ChangeNotifier {
       return 0;
     });
   }
+
+  void deleteAll() {
+    _tasks.clear();
+    notifyListeners();
+  }
 }

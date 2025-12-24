@@ -34,4 +34,9 @@ class NoteProvider with ChangeNotifier {
     _notes.remove(note);
     notifyListeners();
   }
+
+  void deleteAll() {
+    _notes.clear();
+    notifyListeners();
+  }
 }

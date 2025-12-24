@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:myapp/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:myapp/models/subscription.dart';
 import 'package:myapp/providers/subscription_provider.dart';
+import 'package:myapp/providers/settings_provider.dart';
+import 'package:myapp/utils/currency_formatter.dart';
 import 'package:myapp/widgets/add_subscription_form.dart';
 
 class SubscriptionsScreen extends StatelessWidget {
@@ -83,7 +85,8 @@ class SubscriptionsScreen extends StatelessWidget {
   }
 
   Widget _buildSubscriptionCard(BuildContext context, Subscription subscription) {
-    final formattedAmount = NumberFormat.currency(symbol: '€').format(subscription.amount);
+    final settings = Provider.of<SettingsProvider>(context);
+    final formattedAmount = CurrencyFormatter.format(subscription.amount, settings: settings);
     final formattedDate = DateFormat.yMMMd().format(subscription.nextPaymentDate);
 
     return Card(
