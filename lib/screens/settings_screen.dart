@@ -7,7 +7,13 @@ import 'package:myapp/providers/subscription_provider.dart';
 import 'package:myapp/providers/expense_provider.dart';
 import 'package:myapp/providers/task_provider.dart';
 import 'package:myapp/providers/note_provider.dart';
+import 'package:myapp/providers/credit_card_provider.dart';
+import 'package:myapp/providers/overdue_payment_provider.dart';
+import 'package:myapp/providers/course_provider.dart';
+import 'package:myapp/services/backup_service.dart';
 import 'package:myapp/theme/app_colors.dart';
+import 'package:share_plus/share_plus.dart';
+import 'dart:io';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -50,6 +56,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildExchangeRateSection(context),
             const SizedBox(height: 24),
             _buildStatisticsSection(context),
+            const SizedBox(height: 24),
+            _buildBackupSection(context),
             const SizedBox(height: 24),
             _buildDangerZone(context),
             const SizedBox(height: 24),
@@ -249,6 +257,300 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Widget _buildBackupSection(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.backup, color: AppColors.accentPrimary),
+                const SizedBox(width: 8),
+                Text(
+                  'Backup y Restauración',
+                  style: GoogleFonts.oswald(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Exporta todos tus datos a un archivo JSON para hacer una copia de seguridad, o importa datos desde un archivo de respaldo.',
+              style: GoogleFonts.roboto(color: Colors.white70),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _exportData(context),
+                    icon: const Icon(Icons.download),
+                    label: const Text('Exportar Datos'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accentPrimary,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _importData(context),
+                    icon: const Icon(Icons.upload),
+                    label: const Text('Importar Datos'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accentSecondary,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _exportData(BuildContext context) async {
+    try {
+      // Mostrar loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      final debtProvider = Provider.of<DebtProvider>(context, listen: false);
+      final subscriptionProvider = Provider.of<SubscriptionProvider>(context, listen: false);
+      final expenseProvider = Provider.of<ExpenseProvider>(context, listen: false);
+      final creditCardProvider = Provider.of<CreditCardProvider>(context, listen: false);
+      final overduePaymentProvider = Provider.of<OverduePaymentProvider>(context, listen: false);
+      final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+      final noteProvider = Provider.of<NoteProvider>(context, listen: false);
+      final courseProvider = Provider.of<CourseProvider>(context, listen: false);
+      final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+
+      final filePath = await BackupService.exportData(
+        context: context,
+        debtProvider: debtProvider,
+        subscriptionProvider: subscriptionProvider,
+        expenseProvider: expenseProvider,
+        creditCardProvider: creditCardProvider,
+        overduePaymentProvider: overduePaymentProvider,
+        taskProvider: taskProvider,
+        noteProvider: noteProvider,
+        courseProvider: courseProvider,
+        settingsProvider: settingsProvider,
+      );
+
+      if (context.mounted) {
+        Navigator.pop(context); // Cerrar loading
+
+        if (filePath != null) {
+          // Compartir el archivo
+          final file = File(filePath);
+          if (await file.exists()) {
+            await Share.shareXFiles(
+              [XFile(filePath)],
+              text: 'Backup de TDAH Organizer',
+            );
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Datos exportados exitosamente',
+                style: GoogleFonts.roboto(),
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Error al exportar los datos',
+                style: GoogleFonts.roboto(),
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context); // Cerrar loading si está abierto
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error: ${e.toString()}',
+              style: GoogleFonts.roboto(),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _importData(BuildContext context) async {
+    try {
+      // Mostrar advertencia
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Importar Datos', style: GoogleFonts.oswald(fontWeight: FontWeight.bold)),
+          content: Text(
+            '⚠️ ADVERTENCIA: Esta acción reemplazará todos los datos actuales con los datos del archivo importado.\n\n'
+            'Se recomienda hacer un backup antes de importar.\n\n'
+            '¿Deseas continuar?',
+            style: GoogleFonts.roboto(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('Cancelar', style: GoogleFonts.roboto()),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+              ),
+              child: Text('Continuar', style: GoogleFonts.roboto(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+
+      if (confirm != true) return;
+
+      // Mostrar loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+
+      final result = await BackupService.importData(context);
+
+      if (context.mounted) {
+        Navigator.pop(context); // Cerrar loading
+
+        if (result != null && result['success'] == true) {
+          // Confirmar importación
+          final confirmImport = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Confirmar Importación', style: GoogleFonts.oswald(fontWeight: FontWeight.bold)),
+              content: Text(
+                'El archivo se validó correctamente.\n\n'
+                'Versión: ${result['version']}\n'
+                'Fecha de exportación: ${result['exportDate'] ?? 'Desconocida'}\n\n'
+                '¿Deseas aplicar estos datos?',
+                style: GoogleFonts.roboto(),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text('Cancelar', style: GoogleFonts.roboto()),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accentPrimary,
+                  ),
+                  child: Text('Aplicar', style: GoogleFonts.roboto(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          );
+
+          if (confirmImport == true && context.mounted) {
+            // Mostrar loading
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+
+            // Eliminar datos actuales primero
+            Provider.of<DebtProvider>(context, listen: false).deleteAll();
+            Provider.of<SubscriptionProvider>(context, listen: false).deleteAll();
+            Provider.of<ExpenseProvider>(context, listen: false).deleteAll();
+            Provider.of<CreditCardProvider>(context, listen: false).deleteAll();
+            Provider.of<OverduePaymentProvider>(context, listen: false).deleteAll();
+            Provider.of<TaskProvider>(context, listen: false).deleteAll();
+            Provider.of<NoteProvider>(context, listen: false).deleteAll();
+            Provider.of<CourseProvider>(context, listen: false).deleteAll();
+
+            // Aplicar datos importados
+            await BackupService.applyImportedData(
+              context: context,
+              data: result['data'] as Map<String, dynamic>,
+              debtProvider: Provider.of<DebtProvider>(context, listen: false),
+              subscriptionProvider: Provider.of<SubscriptionProvider>(context, listen: false),
+              expenseProvider: Provider.of<ExpenseProvider>(context, listen: false),
+              creditCardProvider: Provider.of<CreditCardProvider>(context, listen: false),
+              overduePaymentProvider: Provider.of<OverduePaymentProvider>(context, listen: false),
+              taskProvider: Provider.of<TaskProvider>(context, listen: false),
+              noteProvider: Provider.of<NoteProvider>(context, listen: false),
+              courseProvider: Provider.of<CourseProvider>(context, listen: false),
+              settingsProvider: Provider.of<SettingsProvider>(context, listen: false),
+            );
+
+            if (context.mounted) {
+              Navigator.pop(context); // Cerrar loading
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Datos importados exitosamente',
+                    style: GoogleFonts.roboto(),
+                  ),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                result?['message'] ?? 'Error al importar los datos',
+                style: GoogleFonts.roboto(),
+              ),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context); // Cerrar loading si está abierto
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error: ${e.toString()}',
+              style: GoogleFonts.roboto(),
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    }
+  }
+
   Widget _buildDangerZone(BuildContext context) {
     return Card(
       elevation: 2,
@@ -320,8 +622,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Provider.of<DebtProvider>(context, listen: false).deleteAll();
     Provider.of<SubscriptionProvider>(context, listen: false).deleteAll();
     Provider.of<ExpenseProvider>(context, listen: false).deleteAll();
+    Provider.of<CreditCardProvider>(context, listen: false).deleteAll();
+    Provider.of<OverduePaymentProvider>(context, listen: false).deleteAll();
     Provider.of<TaskProvider>(context, listen: false).deleteAll();
     Provider.of<NoteProvider>(context, listen: false).deleteAll();
+    Provider.of<CourseProvider>(context, listen: false).deleteAll();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

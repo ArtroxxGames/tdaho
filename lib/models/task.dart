@@ -11,6 +11,7 @@ class Task {
   final DateTime? dueDate;
   final TaskPriority priority;
   final TaskStatus status;
+  final List<String> etiquetas;
 
   Task({
     String? id,
@@ -19,7 +20,9 @@ class Task {
     this.dueDate,
     this.priority = TaskPriority.media,
     this.status = TaskStatus.pendiente,
-  }) : id = id ?? UniqueKey().toString();
+    List<String>? etiquetas,
+  }) : id = id ?? UniqueKey().toString(),
+       etiquetas = etiquetas ?? [];
 
   Task copyWith({
     String? id,
@@ -28,6 +31,7 @@ class Task {
     DateTime? dueDate,
     TaskPriority? priority,
     TaskStatus? status,
+    List<String>? etiquetas,
   }) {
     return Task(
       id: id ?? this.id,
@@ -36,6 +40,41 @@ class Task {
       dueDate: dueDate ?? this.dueDate,
       priority: priority ?? this.priority,
       status: status ?? this.status,
+      etiquetas: etiquetas ?? this.etiquetas,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'dueDate': dueDate?.toIso8601String(),
+      'priority': priority.name,
+      'status': status.name,
+      'etiquetas': etiquetas,
+    };
+  }
+
+  factory Task.fromJson(Map<String, dynamic> json) {
+    return Task(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String?,
+      dueDate: json['dueDate'] != null 
+          ? DateTime.parse(json['dueDate'] as String)
+          : null,
+      priority: TaskPriority.values.firstWhere(
+        (e) => e.name == json['priority'],
+        orElse: () => TaskPriority.media,
+      ),
+      status: TaskStatus.values.firstWhere(
+        (e) => e.name == json['status'],
+        orElse: () => TaskStatus.pendiente,
+      ),
+      etiquetas: json['etiquetas'] != null
+          ? List<String>.from(json['etiquetas'] as List)
+          : [],
     );
   }
 }

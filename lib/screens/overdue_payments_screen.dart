@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:myapp/models/overdue_payment.dart';
 import 'package:myapp/providers/overdue_payment_provider.dart';
-import 'package:myapp/providers/debt_provider.dart';
 import 'package:myapp/providers/settings_provider.dart';
 import 'package:myapp/utils/currency_formatter.dart';
 import 'package:myapp/widgets/add_overdue_payment_form.dart';
@@ -12,7 +11,10 @@ import 'package:myapp/widgets/add_overdue_payment_form.dart';
 class OverduePaymentsScreen extends StatelessWidget {
   const OverduePaymentsScreen({super.key});
 
-  void _showOverduePaymentForm(BuildContext context, {OverduePayment? payment}) {
+  void _showOverduePaymentForm(
+    BuildContext context, {
+    OverduePayment? payment,
+  }) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -23,14 +25,17 @@ class OverduePaymentsScreen extends StatelessWidget {
           ),
           child: AddOverduePaymentForm(
             payment: payment,
-            onSave: (newPayment) {
-              final provider = Provider.of<OverduePaymentProvider>(context, listen: false);
+            onSave: (newPayment) async {
+              final provider = Provider.of<OverduePaymentProvider>(
+                context,
+                listen: false,
+              );
               if (payment == null) {
-                provider.addOverduePayment(newPayment);
+                await provider.addOverduePayment(newPayment);
               } else {
                 // Para editar, eliminamos el anterior y agregamos el nuevo
-                provider.deleteOverduePayment(payment);
-                provider.addOverduePayment(newPayment);
+                await provider.deleteOverduePayment(payment);
+                await provider.addOverduePayment(newPayment);
               }
             },
           ),
@@ -49,7 +54,10 @@ class OverduePaymentsScreen extends StatelessWidget {
           children: [
             Text(
               'Pagos Atrasados',
-              style: GoogleFonts.oswald(fontSize: 32, fontWeight: FontWeight.bold),
+              style: GoogleFonts.oswald(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 24),
             _buildSummaryCards(context),
@@ -72,7 +80,10 @@ class OverduePaymentsScreen extends StatelessWidget {
                         child: ListView.builder(
                           itemCount: pendingPayments.length,
                           itemBuilder: (context, index) {
-                            return _buildPaymentCard(context, pendingPayments[index]);
+                            return _buildPaymentCard(
+                              context,
+                              pendingPayments[index],
+                            );
                           },
                         ),
                       ),
@@ -124,7 +135,9 @@ class OverduePaymentsScreen extends StatelessWidget {
             Expanded(
               child: Card(
                 elevation: 2,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -132,7 +145,10 @@ class OverduePaymentsScreen extends StatelessWidget {
                     children: [
                       Text(
                         'Mes Actual',
-                        style: GoogleFonts.roboto(fontSize: 12, color: Colors.white70),
+                        style: GoogleFonts.roboto(
+                          fontSize: 12,
+                          color: Colors.white70,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -223,7 +239,10 @@ class OverduePaymentsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryByDebt(BuildContext context, OverduePaymentProvider provider) {
+  Widget _buildSummaryByDebt(
+    BuildContext context,
+    OverduePaymentProvider provider,
+  ) {
     final summary = provider.getSummaryByDebt();
     if (summary.isEmpty) return const SizedBox.shrink();
 
@@ -237,7 +256,10 @@ class OverduePaymentsScreen extends StatelessWidget {
           children: [
             Text(
               'Resumen por Concepto',
-              style: GoogleFonts.oswald(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.oswald(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 12),
             ...summary.entries.map((entry) {
@@ -272,26 +294,32 @@ class OverduePaymentsScreen extends StatelessWidget {
 
   Widget _buildPaymentCard(BuildContext context, OverduePayment payment) {
     final settings = Provider.of<SettingsProvider>(context);
-    final provider = Provider.of<OverduePaymentProvider>(context, listen: false);
+    final provider = Provider.of<OverduePaymentProvider>(
+      context,
+      listen: false,
+    );
 
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 12,
+        ),
         leading: CircleAvatar(
           backgroundColor: payment.isDueToday
               ? Colors.orange.shade400
               : payment.daysOverdue > 0
-                  ? Colors.red.shade400
-                  : Colors.amber.shade400,
+              ? Colors.red.shade400
+              : Colors.amber.shade400,
           child: Icon(
             payment.isDueToday
                 ? Icons.warning
                 : payment.daysOverdue > 0
-                    ? Icons.error
-                    : Icons.schedule,
+                ? Icons.error
+                : Icons.schedule,
             color: Colors.white,
           ),
         ),
@@ -315,8 +343,8 @@ class OverduePaymentsScreen extends StatelessWidget {
                 color: payment.isDueToday
                     ? Colors.orange.shade400
                     : payment.daysOverdue > 0
-                        ? Colors.red.shade400
-                        : Colors.amber.shade400,
+                    ? Colors.red.shade400
+                    : Colors.amber.shade400,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -345,11 +373,14 @@ class OverduePaymentsScreen extends StatelessWidget {
               children: [
                 IconButton(
                   icon: const Icon(Icons.check_circle, color: Colors.green),
-                  onPressed: () {
-                    provider.markAsPaid(payment);
+                  onPressed: () async {
+                    await provider.markAsPaid(payment);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Pago marcado como pagado', style: GoogleFonts.roboto()),
+                        content: Text(
+                          'Pago marcado como pagado',
+                          style: GoogleFonts.roboto(),
+                        ),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -362,7 +393,10 @@ class OverduePaymentsScreen extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: Text('Eliminar Pago Atrasado', style: GoogleFonts.oswald()),
+                        title: Text(
+                          'Eliminar Pago Atrasado',
+                          style: GoogleFonts.oswald(),
+                        ),
                         content: Text(
                           '¿Estás seguro de eliminar este registro de pago atrasado?',
                           style: GoogleFonts.roboto(),
@@ -370,15 +404,23 @@ class OverduePaymentsScreen extends StatelessWidget {
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text('Cancelar', style: GoogleFonts.roboto()),
+                            child: Text(
+                              'Cancelar',
+                              style: GoogleFonts.roboto(),
+                            ),
                           ),
                           ElevatedButton(
-                            onPressed: () {
-                              provider.deleteOverduePayment(payment);
+                            onPressed: () async {
+                              await provider.deleteOverduePayment(payment);
                               Navigator.pop(context);
                             },
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                            child: Text('Eliminar', style: GoogleFonts.roboto()),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                            ),
+                            child: Text(
+                              'Eliminar',
+                              style: GoogleFonts.roboto(),
+                            ),
                           ),
                         ],
                       ),

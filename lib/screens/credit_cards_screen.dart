@@ -39,15 +39,15 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
           ),
           child: AddCreditCardForm(
             creditCard: creditCard,
-            onSave: (newCard) {
+            onSave: (newCard) async {
               final provider = Provider.of<CreditCardProvider>(
                 context,
                 listen: false,
               );
               if (creditCard == null) {
-                provider.addCreditCard(newCard);
+                await provider.addCreditCard(newCard);
               } else {
-                provider.updateCreditCard(creditCard, newCard);
+                await provider.updateCreditCard(creditCard, newCard);
               }
             },
           ),
@@ -313,8 +313,8 @@ class _CreditCardsScreenState extends State<CreditCardsScreen> {
                         child: Text('Cancelar', style: GoogleFonts.roboto()),
                       ),
                       ElevatedButton(
-                        onPressed: () {
-                          creditCardProvider.deleteCreditCard(card);
+                        onPressed: () async {
+                          await creditCardProvider.deleteCreditCard(card);
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(

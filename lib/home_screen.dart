@@ -9,6 +9,9 @@ import 'package:myapp/screens/subscriptions_screen.dart';
 import 'package:myapp/screens/notes_screen.dart';
 import 'package:myapp/screens/focus_mode_screen.dart';
 import 'package:myapp/screens/settings_screen.dart';
+import 'package:myapp/screens/courses_screen.dart';
+import 'package:myapp/screens/tasks_screen.dart';
+import 'package:myapp/screens/logs_screen.dart';
 import 'package:myapp/l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,8 +31,11 @@ class _HomeScreenState extends State<HomeScreen> {
     const SubscriptionsScreen(),
     const CreditCardsScreen(),
     const OverduePaymentsScreen(),
+    const CoursesScreen(),
+    const TasksScreen(),
     const NotesScreen(),
     const FocusModeScreen(),
+    const LogsScreen(),
     const SettingsScreen(),
   ];
 
@@ -42,8 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
       l10n.subscriptions,
       'Tarjetas',
       'Pagos Atrasados',
+      'Cursos',
+      l10n.tasks,
       l10n.notes,
       l10n.focus,
+      'Logs',
       'Configuración',
     ];
   }
@@ -55,8 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
     Icons.subscriptions_rounded,
     Icons.account_balance_wallet_rounded,
     Icons.warning_rounded,
+    Icons.school_rounded,
+    Icons.checklist_rounded,
     Icons.note_rounded,
     Icons.center_focus_strong_rounded,
+    Icons.list_alt_rounded,
     Icons.settings_rounded,
   ];
 

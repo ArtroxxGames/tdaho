@@ -6,16 +6,20 @@
 - [x] Configuración del proyecto y tema visual
 - [x] Navegación y layout principal
 - [x] Sistema de gestión de estado con Provider
-- [x] Dashboard básico
-- [x] Deudas (vista cards y tabla)
+- [x] Dashboard completo con todas las secciones
+- [x] Deudas (vista cards y tabla parcial)
 - [x] Suscripciones
 - [x] Gastos Diarios
+- [x] Tarjetas de Crédito
+- [x] Pagos Atrasados
 - [x] Tareas (lista básica)
+- [x] Cursos & Educación (módulo completo) ⭐ **NUEVO**
 - [x] Notas
 - [x] Temporizador Pomodoro (Focus)
 - [x] Sistema de moneda configurable (PYG por defecto)
 - [x] Pantalla de Configuración
 - [x] Persistencia de configuración
+- [x] **Persistencia de Datos con Hive** ⭐ **NUEVO** - Todos los providers
 
 ---
 
@@ -24,77 +28,69 @@
 ### **FASE 1: Funcionalidades Financieras Core** (Prioridad Alta)
 
 #### 1.1 Tarjetas de Crédito (`/tarjetas`)
-**Estado:** ❌ No implementado  
+**Estado:** ✅ Completado  
 **Prioridad:** 🔴 Alta  
 **Complejidad:** Media
 
 **Funcionalidades:**
-- [ ] Modelo `CreditCard`
-- [ ] Provider `CreditCardProvider`
-- [ ] Pantalla principal con grid de tarjetas
-- [ ] Resumen mensual por tarjeta (agrupado por día de cierre)
-- [ ] Cálculo de total a pagar (contado + cuotas)
-- [ ] Cálculo de disponible (límite - gastos)
-- [ ] Barra de progreso de uso
-- [ ] Lista expandible de gastos por tarjeta
-- [ ] Modal crear/editar tarjeta
-- [ ] Activar/Desactivar tarjeta
-- [ ] Asociar gastos a tarjetas
-- [ ] Cálculo de cuota actual para gastos en cuotas
-
-**Dependencias:**
-- Modelo Expense debe tener `tarjetaId` y campos de cuotas
-- Integración con ExpenseProvider
+- [x] Modelo `CreditCard` con serialización
+- [x] Provider `CreditCardProvider` con persistencia Hive
+- [x] Pantalla principal con grid de tarjetas
+- [x] Resumen mensual por tarjeta (agrupado por día de cierre)
+- [x] Cálculo de total a pagar (contado + cuotas)
+- [x] Cálculo de disponible (límite - gastos)
+- [x] Barra de progreso de uso
+- [x] Lista expandible de gastos por tarjeta
+- [x] Modal crear/editar tarjeta
+- [x] Activar/Desactivar tarjeta
+- [x] Asociar gastos a tarjetas
+- [x] Cálculo de cuota actual para gastos en cuotas
 
 ---
 
 #### 1.2 Pagos Atrasados (`/atrasados`)
-**Estado:** ❌ No implementado  
+**Estado:** ✅ Completado  
 **Prioridad:** 🔴 Alta  
 **Complejidad:** Baja-Media
 
 **Funcionalidades:**
-- [ ] Modelo `OverduePayment`
-- [ ] Provider `OverduePaymentProvider`
-- [ ] Pantalla principal con cards de resumen
-- [ ] Lista de pagos pendientes ordenados por fecha
-- [ ] Cálculo automático de días de atraso
-- [ ] Estado "Todo al día" cuando no hay atrasos
-- [ ] Modal registrar atraso manual
-- [ ] Marcar como pagado
-- [ ] Resumen por concepto
-- [ ] Integración con DebtProvider para detectar atrasos automáticamente
-
-**Dependencias:**
-- DebtProvider debe calcular atrasos basado en fechas de vencimiento
+- [x] Modelo `OverduePayment` con serialización
+- [x] Provider `OverduePaymentProvider` con persistencia Hive
+- [x] Pantalla principal con cards de resumen
+- [x] Lista de pagos pendientes ordenados por fecha
+- [x] Cálculo automático de días de atraso
+- [x] Estado "Todo al día" cuando no hay atrasos
+- [x] Modal registrar atraso manual
+- [x] Marcar como pagado
+- [x] Resumen por concepto
+- [x] Integración con DebtProvider para detectar atrasos automáticamente
 
 ---
 
 ### **FASE 2: Módulos de Productividad** (Prioridad Media-Alta)
 
 #### 2.1 Cursos & Educación (`/cursos`)
-**Estado:** ⚠️ Parcial (solo focus_mode_screen básico)  
+**Estado:** ✅ Completado  
 **Prioridad:** 🟡 Media-Alta  
 **Complejidad:** Media
 
 **Funcionalidades:**
-- [ ] Modelo `Course`
-- [ ] Provider `CourseProvider`
-- [ ] Vista Lista con grid responsive
-- [ ] Vista Calendario semanal (7 días)
-- [ ] Cards de resumen (activos, pausados, para hoy, progreso promedio)
-- [ ] Sección "Cursos para Hoy"
-- [ ] Filtros (Todos/Activos/Pausados)
-- [ ] Modal crear/editar curso
-- [ ] Asignar días de estudio (checkboxes L-D)
-- [ ] Hora de inicio y duración
-- [ ] Actualizar progreso (%)
-- [ ] Activar/Pausar curso
-- [ ] Plataformas disponibles (select)
-- [ ] Link externo a curso
-
-**Dependencias:**
-- Calendario widget o TableCalendar package
+- [x] Modelo `Course` con serialización completa
+- [x] Provider `CourseProvider` con persistencia Hive
+- [x] Vista Lista con grid responsive (1/2/3 columnas)
+- [x] Vista Calendario semanal (7 días, L-D) con día actual destacado
+- [x] Cards de resumen (activos, pausados, para hoy, progreso promedio)
+- [x] Sección "Cursos para Hoy" con cards horizontales scrollables
+- [x] Filtros (Todos/Activos/Pausados)
+- [x] Modal crear/editar curso completo
+- [x] Asignar días de estudio (chips interactivos L-D)
+- [x] Hora de inicio (time picker) y duración
+- [x] Actualizar progreso (%)
+- [x] Activar/Pausar curso
+- [x] 10 Plataformas disponibles (select)
+- [x] Link externo a curso
+- [x] Integrado en Dashboard
+- [x] Agregado a navegación principal
 
 ---
 
@@ -202,22 +198,29 @@
 
 ---
 
-### **FASE 6: Persistencia de Datos** (Prioridad Alta - Próximo paso)
+### **FASE 6: Persistencia de Datos** ✅ **COMPLETADA**
 
 #### 6.1 Almacenamiento Local
-**Estado:** ⚠️ Solo configuración  
+**Estado:** ✅ Completado  
 **Prioridad:** 🔴 Alta  
 **Complejidad:** Media
 
 **Funcionalidades:**
-- [ ] Integrar Hive o Isar para persistencia local
-- [ ] Migrar todos los providers a usar almacenamiento persistente
-- [ ] Sincronización inicial de datos de muestra
-- [ ] Manejo de migraciones de datos
-
-**Dependencias:**
-- Package Hive o Isar
-- Modelos deben ser serializables
+- [x] Integrado Hive y hive_flutter para persistencia local
+- [x] Creado `StorageService` centralizado
+- [x] Migrados todos los providers a usar almacenamiento persistente:
+  - [x] `DebtProvider`
+  - [x] `SubscriptionProvider`
+  - [x] `ExpenseProvider`
+  - [x] `CreditCardProvider`
+  - [x] `OverduePaymentProvider`
+  - [x] `TaskProvider`
+  - [x] `NoteProvider`
+  - [x] `CourseProvider`
+- [x] Todos los modelos son serializables (toJson/fromJson)
+- [x] Carga inicial de datos al iniciar app
+- [x] Datos de muestra se cargan automáticamente si la caja está vacía
+- [x] Actualizadas todas las pantallas para usar métodos async
 
 ---
 
@@ -228,9 +231,9 @@
 2. **Pagos Atrasados** (1-2 días)
 3. **Mejoras al Dashboard** (1 día)
 
-### Sprint 2: Persistencia y Productividad
-4. **Persistencia Local (Hive/Isar)** (2-3 días)
-5. **Cursos & Educación** (2-3 días)
+### Sprint 2: Persistencia y Productividad ✅ **COMPLETADO**
+4. ✅ **Persistencia Local (Hive)** (2-3 días) - **COMPLETADO**
+5. ✅ **Cursos & Educación** (2-3 días) - **COMPLETADO**
 
 ### Sprint 3: Mejoras y Utilidades
 6. **Tareas Kanban Mejorado** (2 días)
@@ -246,10 +249,11 @@
 
 ## 🎯 Objetivos por Fase
 
-### Fase 1-3: Funcionalidades Base ✅
-- Todas las funcionalidades core implementadas
-- Datos persistentes localmente
-- UI/UX completa según documentación
+### Fase 1-3: Funcionalidades Base ✅ **COMPLETADA**
+- ✅ Todas las funcionalidades core implementadas
+- ✅ Datos persistentes localmente (Hive)
+- ✅ UI/UX completa según documentación
+- ✅ Módulo Cursos & Educación completo
 
 ### Fase 4-5: Mejoras y Backend 🔄
 - Autenticación
@@ -267,6 +271,17 @@
 
 ---
 
-**Última actualización:** 2024
-**Estado del Proyecto:** En desarrollo activo
+**Última actualización:** Diciembre 2024
+**Estado del Proyecto:** En desarrollo activo - **App Funcional** ✅
+
+---
+
+## 🎉 PROGRESO RECIENTE (Diciembre 2024)
+
+### ✅ Completado Recientemente:
+1. **Persistencia de Datos Completa:** Todos los providers migrados a Hive
+2. **Módulo Cursos & Educación:** Implementación completa con todas las funcionalidades
+3. **App Funcional:** Los datos ahora persisten entre sesiones
+
+### 📊 Completitud Actual: **~80%** (aumentó desde 65%)
 

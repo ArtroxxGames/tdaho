@@ -51,5 +51,35 @@ class CreditCard {
     }
     return name;
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'bank': bank,
+      'lastFourDigits': lastFourDigits,
+      'creditLimit': creditLimit,
+      'closingDay': closingDay,
+      'dueDay': dueDay,
+      'isActive': isActive,
+      'notes': notes,
+    };
+  }
+
+  factory CreditCard.fromJson(Map<String, dynamic> json) {
+    return CreditCard(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      bank: json['bank'] as String?,
+      lastFourDigits: json['lastFourDigits'] as String?,
+      creditLimit: json['creditLimit'] != null 
+          ? (json['creditLimit'] as num).toDouble()
+          : null,
+      closingDay: json['closingDay'] as int,
+      dueDay: json['dueDay'] as int,
+      isActive: json['isActive'] as bool? ?? true,
+      notes: json['notes'] as String?,
+    );
+  }
 }
 

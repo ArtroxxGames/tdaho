@@ -20,12 +20,12 @@ class NotesScreen extends StatelessWidget {
           ),
           child: AddNoteForm(
             note: note,
-            onSave: (newNote) {
+            onSave: (newNote) async {
               final provider = Provider.of<NoteProvider>(context, listen: false);
               if (note == null) {
-                provider.addNote(newNote);
+                await provider.addNote(newNote);
               } else {
-                provider.updateNote(note, newNote);
+                await provider.updateNote(note, newNote);
               }
             },
           ),
@@ -99,8 +99,8 @@ class NotesScreen extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.white70),
-              onPressed: () {
-                Provider.of<NoteProvider>(context, listen: false).deleteNote(note);
+              onPressed: () async {
+                await Provider.of<NoteProvider>(context, listen: false).deleteNote(note);
               },
             ),
           ],

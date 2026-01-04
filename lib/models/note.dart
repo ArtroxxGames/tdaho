@@ -16,4 +16,20 @@ class Note {
       content: content ?? this.content,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'content': content,
+    };
+  }
+
+  factory Note.fromJson(Map<String, dynamic> json) {
+    return Note(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      content: json['content'] as String,
+    );
+  }
 }

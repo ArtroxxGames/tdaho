@@ -2,11 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:myapp/models/overdue_payment.dart';
 import 'package:myapp/models/debt.dart';
 import 'package:myapp/providers/debt_provider.dart';
+import 'package:myapp/services/storage_service.dart';
 
 class OverduePaymentProvider with ChangeNotifier {
-  final List<OverduePayment> _overduePayments = [];
+  List<OverduePayment> _overduePayments = [];
+
+  OverduePaymentProvider() {
+    _loadOverduePayments();
+  }
 
   List<OverduePayment> get overduePayments => _overduePayments;
+
+  void _loadOverduePayments() {
+    _overduePayments = StorageService.loadList<OverduePayment>(
+      StorageService.overduePaymentsBox,
+      (json) => OverduePayment.fromJson(json),
+    );
+  }
+
+  Future<void> _saveOverduePayments() async {
+    await StorageService.saveList(
+      StorageService.overduePaymentsBox,
+      _overduePayments,
+    );
+    notifyListeners();
+  }
 
   // Obtener pagos pendientes (no pagados)
   List<OverduePayment> get pendingPayments {
@@ -22,24 +42,24 @@ class OverduePaymentProvider with ChangeNotifier {
   // Obtener cantidad de pagos pendientes
   int get pendingCount => _overduePayments.length;
 
-  void addOverduePayment(OverduePayment payment) {
+  Future<void> addOverduePayment(OverduePayment payment) async {
     _overduePayments.add(payment);
-    notifyListeners();
+    await _saveOverduePayments();
   }
 
-  void markAsPaid(OverduePayment payment) {
+  Future<void> markAsPaid(OverduePayment payment) async {
     _overduePayments.remove(payment);
-    notifyListeners();
+    await _saveOverduePayments();
   }
 
-  void deleteOverduePayment(OverduePayment payment) {
+  Future<void> deleteOverduePayment(OverduePayment payment) async {
     _overduePayments.remove(payment);
-    notifyListeners();
+    await _saveOverduePayments();
   }
 
-  void deleteAll() {
+  Future<void> deleteAll() async {
     _overduePayments.clear();
-    notifyListeners();
+    await _saveOverduePayments();
   }
 
   // Detectar automáticamente pagos atrasados desde las deudas

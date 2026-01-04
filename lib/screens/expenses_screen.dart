@@ -38,12 +38,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           ),
           child: AddExpenseForm(
             expense: expense,
-            onSave: (newExpense) {
+            onSave: (newExpense) async {
               final provider = Provider.of<ExpenseProvider>(context, listen: false);
               if (expense == null) {
-                provider.addExpense(newExpense);
+                await provider.addExpense(newExpense);
               } else {
-                provider.updateExpense(expense, newExpense);
+                await provider.updateExpense(expense, newExpense);
               }
             },
           ),
@@ -171,8 +171,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 ),
                  IconButton(
                   icon: const Icon(Icons.delete, size: 20, color: Colors.white70),
-                  onPressed: () {
-                    Provider.of<ExpenseProvider>(context, listen: false).deleteExpense(expense);
+                  onPressed: () async {
+                    await Provider.of<ExpenseProvider>(context, listen: false).deleteExpense(expense);
                   }
                 ),
               ],

@@ -9,6 +9,7 @@ import 'package:myapp/providers/debt_provider.dart';
 import 'package:myapp/providers/overdue_payment_provider.dart';
 import 'package:myapp/providers/task_provider.dart';
 import 'package:myapp/providers/settings_provider.dart';
+import 'package:myapp/providers/course_provider.dart';
 import 'package:myapp/utils/currency_formatter.dart';
 import 'package:myapp/models/task.dart';
 import 'package:myapp/screens/expenses_screen.dart';
@@ -438,13 +439,21 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildEducationStats(BuildContext context) {
-    // Por ahora, mostrar placeholder hasta que se implemente el módulo de cursos
+    final courseProvider = Provider.of<CourseProvider>(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildStatRow('Cursos Activos', '0', Colors.purple),
+        _buildStatRow(
+          'Cursos Activos',
+          courseProvider.activeCourses.length.toString(),
+          Colors.purple,
+        ),
         const SizedBox(height: 8),
-        _buildStatRow('Progreso Promedio', '0%', Colors.purple),
+        _buildStatRow(
+          'Progreso Promedio',
+          '${courseProvider.averageProgress.toStringAsFixed(0)}%',
+          Colors.purple,
+        ),
       ],
     );
   }

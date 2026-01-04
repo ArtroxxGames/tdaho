@@ -58,5 +58,31 @@ class OverduePayment {
       createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'debtId': debtId,
+      'debtName': debtName,
+      'month': month,
+      'amount': amount,
+      'dueDate': dueDate.toIso8601String(),
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
+
+  factory OverduePayment.fromJson(Map<String, dynamic> json) {
+    return OverduePayment(
+      id: json['id'] as String,
+      debtId: json['debtId'] as String?,
+      debtName: json['debtName'] as String,
+      month: json['month'] as String,
+      amount: (json['amount'] as num).toDouble(),
+      dueDate: DateTime.parse(json['dueDate'] as String),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : DateTime.now(),
+    );
+  }
 }
 

@@ -79,10 +79,38 @@
   - [x] Acciones Rápidas (grid responsive)
   - [x] Tip del Día con mensajes motivacionales TDAH
 
+### Fase 7: Persistencia de Datos (✅ Completada)
+
+- [x] **StorageService**: Servicio centralizado para gestión de Hive
+- [x] **Migración de Providers**: Todos los providers migrados a usar Hive:
+  - [x] DebtProvider
+  - [x] SubscriptionProvider
+  - [x] ExpenseProvider
+  - [x] CreditCardProvider
+  - [x] OverduePaymentProvider
+  - [x] TaskProvider
+  - [x] NoteProvider
+- [x] **Serialización de Modelos**: Todos los modelos tienen toJson/fromJson
+- [x] **Inicialización**: Hive configurado en main.dart
+- [x] **Actualización de Pantallas**: Todas las pantallas usan métodos async
+
+### Fase 8: Cursos & Educación (✅ Completada)
+
+- [x] **Modelo Course**: Modelo completo con todos los campos y serialización
+- [x] **CourseProvider**: Provider con persistencia Hive y métodos completos
+- [x] **Pantalla Courses**: Pantalla completa con:
+  - [x] Toggle vista Lista/Calendario
+  - [x] Sección "Cursos para Hoy"
+  - [x] Cards de resumen (activos, pausados, para hoy, progreso promedio)
+  - [x] Vista Lista con grid responsive
+  - [x] Vista Calendario semanal (7 días)
+  - [x] Filtros (Todos/Activos/Pausados)
+  - [x] Formulario crear/editar completo
+- [x] **Integración**: Agregado a Dashboard y navegación principal
+
 ### Próximos Pasos
 
-1.  **Pagos Atrasados**: Implementar modelo, provider y pantalla completa
-2.  **Mejoras al Dashboard**: Agregar cards de resumen completos y acciones rápidas
-3.  **Persistencia de Datos**: Integrar Hive o Isar para persistencia local de todos los datos
-4.  **Cursos & Educación**: Implementar módulo completo con vista lista y calendario
-5.  **Tareas Kanban**: Mejorar con drag & drop y vista Kanban completa
+1.  **Tareas Kanban**: Mejorar con drag & drop y vista Kanban completa
+2.  **Vista Tabla Excel de Deudas**: Completar navegación de años y estados visuales
+3.  **Sistema de Logs**: Implementar módulo completo de logging
+4.  **Backup y Exportación**: Funcionalidad de exportar/importar datos

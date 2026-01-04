@@ -23,12 +23,12 @@ class SubscriptionsScreen extends StatelessWidget {
           ),
           child: AddSubscriptionForm(
             subscription: subscription,
-            onSave: (newSubscription) {
+            onSave: (newSubscription) async {
               final provider = Provider.of<SubscriptionProvider>(context, listen: false);
               if (subscription == null) {
-                provider.addSubscription(newSubscription);
+                await provider.addSubscription(newSubscription);
               } else {
-                provider.updateSubscription(subscription, newSubscription);
+                await provider.updateSubscription(subscription, newSubscription);
               }
             },
           ),
@@ -111,8 +111,8 @@ class SubscriptionsScreen extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.white70),
-              onPressed: () {
-                Provider.of<SubscriptionProvider>(context, listen: false)
+              onPressed: () async {
+                await Provider.of<SubscriptionProvider>(context, listen: false)
                     .deleteSubscription(subscription);
               },
             ),
